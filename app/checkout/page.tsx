@@ -97,13 +97,15 @@ const AddressAndPaymentForm = () => {
     ); // Update Redux state with form data
     if (data.paymentMethod === "COD") {
       addressMutation.mutate(data);
+    } else if (data.paymentMethod === "BANKAK") {
+      router.push("/payment/bankak");
     } else {
       router.push("/payment");
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen p-6">
       <h1 className="md:text-2xl sm:text-xl font-bold mb-4 text-center">
         إضافة العنوان واختيار طريقة الدفع
       </h1>
@@ -203,8 +205,8 @@ const AddressAndPaymentForm = () => {
           </div>
 
           {/* Payment Method */}
-          <div className="flex flex-row direction-reverse justify-around mb-4">
-            <label className="flex items-center">
+          <div dir="rtl" className="justify-around mb-4">
+            <label className="flex items-center  gap-2 mb-2">
               <input
                 type="radio"
                 value="COD"
@@ -215,13 +217,21 @@ const AddressAndPaymentForm = () => {
               />
               <span className="ml-2">الدفع عند الاستلام</span>
             </label>
-            <label className="flex items-center">
+            <label className="flex items-center gap-2 mb-2">
               <input
                 type="radio"
-                value="Instant"
+                value="PAYPAL"
                 {...register("paymentMethod")}
               />
-              <span className="ml-2">الدفع الفوري</span>
+              <span className="ml-2">الدفع عن طريق بطاقة أو paypal</span>
+            </label>
+            <label className="flex items-center  gap-2">
+              <input
+                type="radio"
+                value="BANKAK"
+                {...register("paymentMethod")}
+              />
+              <span className="ml-2">الدفع عن طريق تطبيق بنكك الخرطوم</span>
             </label>
           </div>
 

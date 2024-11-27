@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import {
   AlertDialog,
@@ -26,12 +30,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
- import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import axiosInstance from "@/utils/axiosInstance";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, CalendarIcon, Trash2, Edit } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import Pagination from "@/app/(components)/Pagination";
 
 type Coupon = {
   _id: string;
@@ -43,8 +48,8 @@ type Coupon = {
   expiryDate: string;
 };
 
-async function getCoupons() {
-  const { data } = await axiosInstance.get("/coupons");
+async function getCoupons(page: number, limit: number) {
+  const { data } = await axiosInstance.get("/coupons", {});
   return data;
 }
 
@@ -69,6 +74,9 @@ export default function CouponPage() {
     discount: { type: "PERCENTAGE", value: 0 },
     expiryDate: "",
   });
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [count, setCount] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [couponToDelete, setCouponToDelete] = useState<string | null>(null);
   const queryClient = useQueryClient();
@@ -79,8 +87,8 @@ export default function CouponPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["coupons"],
-    queryFn: getCoupons,
+    queryKey: ["coupons", page, limit],
+    queryFn: () => getCoupons(page, limit),
   });
 
   const addCouponMutation = useMutation({
@@ -158,7 +166,7 @@ export default function CouponPage() {
   const handleEdit = (couponToEdit: Coupon) => {
     setCoupon(couponToEdit);
     setIsEditing(true);
-    formRef.current?.scrollIntoView({ behavior: 'smooth' });
+    formRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleDeleteClick = (couponId: string) => {
@@ -186,16 +194,18 @@ export default function CouponPage() {
 
   const formRef = React.useRef<HTMLFormElement | null>(null);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error loading coupons</div>;
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>الكوبونات</CardTitle>
       </CardHeader>
       <CardContent>
-        <form ref={formRef} onSubmit={handleSubmit} className="mb-4 space-y-6">
+        <form
+          ref={formRef}
+          dir="rtl"
+          onSubmit={handleSubmit}
+          className="mb-4 space-y-6"
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="space-y-2">
               <Label htmlFor="expiryDate">تاريخ انتهاء الصلاحية</Label>
@@ -210,14 +220,24 @@ export default function CouponPage() {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {coupon.expiryDate ? format(new Date(coupon.expiryDate), "PPP") : <span>اختر التاريخ</span>}
+                    {coupon.expiryDate ? (
+                      format(new Date(coupon.expiryDate), "PPP")
+                    ) : (
+                      <span>اختر التاريخ</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
-                    selected={coupon.expiryDate ? new Date(coupon.expiryDate) : undefined}
-                    onSelect={(date) => setCoupon({ ...coupon, expiryDate: date?.toISOString() })}
+                    selected={
+                      coupon.expiryDate
+                        ? new Date(coupon.expiryDate)
+                        : undefined
+                    }
+                    onSelect={(date) =>
+                      setCoupon({ ...coupon, expiryDate: date?.toISOString() })
+                    }
                     initialFocus
                   />
                 </PopoverContent>
@@ -225,20 +245,24 @@ export default function CouponPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="discountValue">
-                {coupon.discount?.type === "PERCENTAGE" ? "الخصم (%)" : "الخصم (SAR)"}
+                {coupon.discount?.type === "PERCENTAGE"
+                  ? "الخصم (%)"
+                  : "الخصم (SAR)"}
               </Label>
               <Input
                 id="discountValue"
                 type="number"
                 required
                 value={coupon.discount?.value || ""}
-                onChange={(e) => setCoupon({ 
-                  ...coupon, 
-                  discount: { 
-                    type: coupon.discount?.type || "PERCENTAGE", // Default to "PERCENTAGE"
-                    value: Number(e.target.value) 
-                  } 
-                })}
+                onChange={(e) =>
+                  setCoupon({
+                    ...coupon,
+                    discount: {
+                      type: coupon.discount?.type || "PERCENTAGE", // Default to "PERCENTAGE"
+                      value: Number(e.target.value),
+                    },
+                  })
+                }
               />
             </div>
             <div className="space-y-2 order-first md:order-last">
@@ -250,16 +274,19 @@ export default function CouponPage() {
               />
             </div>
           </div>
-          <div className="space-y flex items-center justify-end">
+          <div className="space-y flex items-center ">
+            <Label className="ml-2">نوع الخصم</Label>
             <RadioGroup
               value={coupon.discount?.type}
-              onValueChange={(value) => setCoupon({ 
-                ...coupon, 
-                discount: { 
-                  type: value as "PERCENTAGE" | "FIXED", 
-                  value: coupon.discount?.value ?? 0 // Default to 0 if undefined
-                } 
-              })}
+              onValueChange={(value) =>
+                setCoupon({
+                  ...coupon,
+                  discount: {
+                    type: value as "PERCENTAGE" | "FIXED",
+                    value: coupon.discount?.value ?? 0, // Default to 0 if undefined
+                  },
+                })
+              }
               className="flex flex-wrap gap-4"
             >
               <div className="flex items-center space-x-1">
@@ -271,15 +298,20 @@ export default function CouponPage() {
                 <RadioGroupItem value="FIXED" id="fixed" />
               </div>
             </RadioGroup>
-            <Label className="ml-2">نوع الخصم</Label>
           </div>
           <Button
             type="submit"
             className="w-full bg-purple hover:bg-purple-700"
-            disabled={addCouponMutation.isPending || updateCouponMutation.isPending}
+            disabled={
+              addCouponMutation.isPending || updateCouponMutation.isPending
+            }
           >
             {isEditing ? (
-              updateCouponMutation.isPending ? "تحديث..." : "تحديث الكوبون"
+              updateCouponMutation.isPending ? (
+                "تحديث..."
+              ) : (
+                "تحديث الكوبون"
+              )
             ) : (
               <>
                 <Plus className="w-4 h-4 mr-2" />
@@ -288,7 +320,7 @@ export default function CouponPage() {
             )}
           </Button>
         </form>
-        <Table>
+        <Table dir="rtl">
           <TableHeader>
             <TableRow>
               <TableHead className="text-right">الخصم</TableHead>
@@ -297,35 +329,56 @@ export default function CouponPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {coupons.data.coupons.map((coupon: Coupon) => (
-              <TableRow key={coupon._id}>
-                <TableCell>
-                  {coupon.discount.type === "PERCENTAGE"
-                    ? `${coupon.discount.value}%`
-                    : `${coupon.discount.value} SAR`}
-                </TableCell>
-                <TableCell>{coupon.code}</TableCell>
-                <TableCell className="flex items-center justify-end">
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(coupon)}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteClick(coupon._id)}
-                      disabled={deleteCouponMutation.isPending}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center py-5">
+                  <div className="flex justify-center items-center space-x-2">
+                    <span className="text-gray-500 text-lg">
+                      جاري تحميل الكوبونات...
+                    </span>
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : isError ? (
+              <TableRow>
+                <TableCell
+                  colSpan={3}
+                  className="text-center py-5 text-red-500"
+                >
+                  حدث خطأ أثناء تحميل الكوبونات. يرجى المحاولة مرة أخرى.
+                </TableCell>
+              </TableRow>
+            ) : (
+              coupons.data.coupons.map((coupon: Coupon) => (
+                <TableRow key={coupon._id}>
+                  <TableCell>
+                    {coupon.discount.type === "PERCENTAGE"
+                      ? `${coupon.discount.value}%`
+                      : `${coupon.discount.value} SAR`}
+                  </TableCell>
+                  <TableCell>{coupon.code}</TableCell>
+                  <TableCell className="flex items-center ">
+                    <div className="flex space-x-2 gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(coupon)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteClick(coupon._id)}
+                        disabled={deleteCouponMutation.isPending}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
 
@@ -334,15 +387,33 @@ export default function CouponPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
               <AlertDialogDescription>
-                هل أنت متأكد أنك تريد حذف هذا الكوبون؟ هذه العملية لا يمكن التراجع عنها.
+                هل أنت متأكد أنك تريد حذف هذا الكوبون؟ هذه العملية لا يمكن
+                التراجع عنها.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={handleCancelDelete}>Cancel</AlertDialogCancel>
-              <AlertDialogAction className="bg-purple hover:bg-purple-700" onClick={handleConfirmDelete}>Delete</AlertDialogAction>
+              <AlertDialogCancel onClick={handleCancelDelete}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-purple hover:bg-purple-700"
+                onClick={handleConfirmDelete}
+              >
+                Delete
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        <Pagination
+          currentPage={page}
+          totalCount={count}
+          limit={limit}
+          onPageChange={(newPage) => setPage(newPage)}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit);
+            setPage(1);
+          }}
+        />
       </CardContent>
     </Card>
   );

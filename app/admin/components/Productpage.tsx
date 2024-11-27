@@ -1,5 +1,5 @@
 "use client";
-import { Cloudinary, Transformation } from '@cloudinary/url-gen';
+import { Cloudinary, Transformation } from "@cloudinary/url-gen";
 import React, { useState, useRef, useEffect } from "react";
 import { Plus, Trash, X, Edit, Loader2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -8,12 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { opacity } from '@cloudinary/url-gen/actions/adjust';
-import { source } from '@cloudinary/url-gen/actions/overlay';
-import { Position } from '@cloudinary/url-gen/qualifiers';
-import { text } from '@cloudinary/url-gen/qualifiers/source';
-import { TextStyle } from '@cloudinary/url-gen/qualifiers/textStyle';
-import { compass } from '@cloudinary/url-gen/qualifiers/gravity';
+import { opacity } from "@cloudinary/url-gen/actions/adjust";
+import { source } from "@cloudinary/url-gen/actions/overlay";
+import { Position } from "@cloudinary/url-gen/qualifiers";
+import { text } from "@cloudinary/url-gen/qualifiers/source";
+import { TextStyle } from "@cloudinary/url-gen/qualifiers/textStyle";
+import { compass } from "@cloudinary/url-gen/qualifiers/gravity";
 import {
   Table,
   TableHeader,
@@ -36,8 +36,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
-import { ScrollArea } from '@radix-ui/react-scroll-area';
-
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import Pagination from "@/app/(components)/Pagination";
 
 type Product = {
   _id: string;
@@ -67,6 +67,9 @@ type Package = {
 function Productpage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [count, setCount] = useState(0);
   const [formData, setFormData] = useState<Partial<Product>>({
     _id: "",
     name: "",
@@ -80,15 +83,11 @@ function Productpage() {
     packageName: "",
   });
 
-
-  const cld  = new Cloudinary({
-    cloud:{
-     cloudName:"dnugszkww"  
-    }
-  })
-
-
-
+  const cld = new Cloudinary({
+    cloud: {
+      cloudName: "dnugszkww",
+    },
+  });
 
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -104,9 +103,13 @@ function Productpage() {
     isLoading: productsLoading,
     error: productsError,
   } = useQuery({
-    queryKey: ["admin-products"],
+    queryKey: ["admin-products", page, limit],
     queryFn: async () => {
-      const response = await axiosInstance.get("/products");
+      const response = await axiosInstance.get(`products`, {
+        params: { page, limit },
+      });
+      setCount(response?.data?.data?.options.count);
+      console.log(response.data.data);
       return response.data.data.products as Product[];
     },
   });
@@ -256,21 +259,19 @@ function Productpage() {
   };
 
   const handleUploadSuccess = (result: any) => {
-
-    const myImage = cld.image(result.info.public_id) 
-
+    const myImage = cld.image(result.info.public_id);
 
     myImage
-    .overlay(
-      source(
-        text('This is my picture', new TextStyle('arial', 200))
-          .textColor('white')
-          .transformation(new Transformation().adjust(opacity(60)))
-      ).position(new Position().gravity(compass('center')).offsetY(20))
-    )
-    .format('png');
+      .overlay(
+        source(
+          text("This is my picture", new TextStyle("arial", 200))
+            .textColor("white")
+            .transformation(new Transformation().adjust(opacity(60)))
+        ).position(new Position().gravity(compass("center")).offsetY(20))
+      )
+      .format("png");
     const myUrl = myImage.toURL();
-    console.log(myUrl)
+    console.log(myUrl);
 
     setFormData((prev) => ({
       ...prev,
@@ -363,7 +364,7 @@ function Productpage() {
   };
 
   return (
-    <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
+    <Card className="bg-white shadow-lg rounded-lg overflow-hidden ">
       <CardHeader className="bg-gray-50 border-b border-gray-200">
         <CardTitle className="text-xl font-semibold text-gray-800">
           إدارة المنتجات
@@ -393,7 +394,6 @@ function Productpage() {
                       setSearchTerm(packages[0].name);
                     }
                   }}
-                  
                 />
                 {searchTerm && (
                   <Button
@@ -545,7 +545,7 @@ function Productpage() {
             </Label>
             <Textarea
               id="description"
-               dir="rtl"
+              dir="rtl"
               name="description"
               value={formData.description}
               onChange={handleInputChange}
@@ -608,13 +608,8 @@ function Productpage() {
             المنتجات الحالية
           </h3>
           <div className="bg-white overflow-hidden shadow-sm rounded-lg">
-            {productsLoading ? (
-              <p>جاري التحميل...</p>
-            ) : productsError ? (
-              <p>حدث خطأ أثناء تحميل البيانات</p>
-            ) : (
-              <ScrollArea className='h-[400px] overflow-y-scroll scroll'>
-              <Table>
+            <ScrollArea className="h-[400px] overflow-y-scroll scroll">
+              <Table dir="rtl">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-right">الصورة</TableHead>
@@ -624,45 +619,65 @@ function Productpage() {
                     <TableHead className="text-right">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody >
-                  {products?.map((product) => (
-                    <TableRow key={product._id}>
-                      <TableCell className="flex items-center justify-end">
-                        <img
-                          src={product.images[0] || "/placeholder-image.jpg"}
-                          alt={product.name}
-                          className="w-12 h-12 object-cover rounded-full"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {product.name}
-                      </TableCell>
-                      <TableCell>{product.price.finalPrice} ريال</TableCell>
-                      <TableCell>{product.availableQuantity}</TableCell>
-                      <TableCell>
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            variant="outline"
-                            onClick={() => handleEditClick(product)}
-                            disabled={updateProductMutation.isPending}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            onClick={() => handleDeleteClick(product._id)}
-                            disabled={deleteProductMutation.isPending}
-                          >
-                            <Trash className="w-4 h-4" />
-                          </Button>
+                <TableBody>
+                  {productsLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-5">
+                        <div className="flex justify-center items-center space-x-2">
+                          <span className="text-gray-500 text-lg">
+                            جاري تحميل المنتجات...
+                          </span>
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : productsError ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="text-center py-5 text-red-500"
+                      >
+                        حدث خطأ أثناء تحميل المنتجات. يرجى المحاولة مرة أخرى.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    products?.map((product) => (
+                      <TableRow key={product._id}>
+                        <TableCell className="flex items-center justify-end">
+                          <img
+                            src={product.images[0] || "/placeholder-image.jpg"}
+                            alt={product.name}
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {product.name}
+                        </TableCell>
+                        <TableCell>{product.price.finalPrice} ريال</TableCell>
+                        <TableCell>{product.availableQuantity}</TableCell>
+                        <TableCell>
+                          <div className="flex justify-end space-x-2 gap-2">
+                            <Button
+                              variant="outline"
+                              onClick={() => handleEditClick(product)}
+                              disabled={updateProductMutation.isPending}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={() => handleDeleteClick(product._id)}
+                              disabled={deleteProductMutation.isPending}
+                            >
+                              <Trash className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
-              </ScrollArea>
-            )}
+            </ScrollArea>
           </div>
         </div>
 
@@ -670,12 +685,12 @@ function Productpage() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-              <AlertDialogDescription>
+              <AlertDialogDescription className="text-right">
                 هل أنت متأكد أنك تريد حذف هذا المنتج؟ هذه العملية لا يمكن
-                التراجع عنها.
+                التراجع عنها
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
+            <AlertDialogFooter className="mr-auto">
               <AlertDialogCancel onClick={handleCancelDelete}>
                 إلغاء
               </AlertDialogCancel>
@@ -688,6 +703,16 @@ function Productpage() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        <Pagination
+          currentPage={page}
+          totalCount={count}
+          limit={limit}
+          onPageChange={(newPage) => setPage(newPage)}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit);
+            setPage(1);
+          }}
+        />
       </CardContent>
     </Card>
   );

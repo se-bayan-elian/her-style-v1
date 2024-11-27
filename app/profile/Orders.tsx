@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+"use client";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 
-interface Order {
+export interface Order {
   _id: string;
   user: {
     name: string;
@@ -32,7 +33,7 @@ interface Order {
     city: string;
     postalCode: string;
     country: string;
-    googleLocation:string;
+    googleLocation: string;
   };
   cart: {
     totalPrice: number;
@@ -69,6 +70,19 @@ const getStatusColor = (status: string) => {
       return "bg-gray-200 text-gray-800";
   }
 };
+// Utility functions for status handling
+const getPaymentStatusColor = (status: string) => {
+  switch (status) {
+    case "PENDING":
+      return "bg-orange-200 text-orange-800";
+    case "SUCCESS":
+      return "bg-green-200 text-green-800";
+    case "CANCELLED":
+      return "bg-red-200 text-red-800";
+    default:
+      return "bg-gray-200 text-gray-800";
+  }
+};
 
 const getStatusText = (status: string) => {
   switch (status) {
@@ -82,10 +96,23 @@ const getStatusText = (status: string) => {
       return status;
   }
 };
+const getPaymentStatusText = (status: string) => {
+  switch (status) {
+    case "PENDING":
+      return "قيد المراجعة";
+    case "SUCCESS":
+      return "تم الدفع";
+    case "CANCELLED":
+      return "ملغي";
+    default:
+      return status;
+  }
+};
 
-function Orders() {
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-
+function Orders({ defaultId }: { defaultId: string }) {
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>();
+  const initialRender = useRef<boolean>(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
     data: ordersData,
     isLoading: isOrdersLoading,
@@ -97,34 +124,70 @@ function Orders() {
 
   const handleOrderClick = (order: Order) => {
     setSelectedOrder(order);
+    setIsDialogOpen(true); // Open the dialog when a specific order is selected
   };
-
+  useEffect(() => {
+    if (ordersData?.data && defaultId && !initialRender.current) {
+      const order = ordersData.data.orders.filter(
+        (order: any) => order._id === defaultId
+      )[0];
+      handleOrderClick(order);
+      initialRender.current = true;
+    }
+  }, [defaultId, ordersData]);
 
   return (
     <>
       <h2 className="text-2xl font-bold my-4 text-right">طلباتي</h2>
-      {isOrdersLoading ? (
-        <p>جاري تحميل الطلبات...</p>
-      ) : isOrdersError ? (
-        <p>حدث خطأ أثناء تحميل الطلبات. يرجى المحاولة مرة أخرى.</p>
-      ) : (
-        <Card>
-          <CardContent>
-            <Table>
-              <TableHeader>
+      <Card>
+        <CardContent>
+          <Table dir="rtl">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">رقم الطلب</TableHead>
+                <TableHead className="text-center">التاريخ</TableHead>
+                <TableHead className="text-center">المبلغ الإجمالي</TableHead>
+                <TableHead className="text-center">حالة الطلب</TableHead>
+                <TableHead className="text-center">حالة الدفع</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isOrdersLoading ? (
                 <TableRow>
-                  <TableHead className="text-right">رقم الطلب</TableHead>
-                  <TableHead className="text-right">التاريخ</TableHead>
-                  <TableHead className="text-right">المبلغ الإجمالي</TableHead>
-                  <TableHead className="text-right">حالة الطلب</TableHead>
-                  <TableHead className="text-right">طريقة الدفع</TableHead>
+                  <TableCell colSpan={5} className="text-center py-5">
+                    <div className="flex justify-center items-center space-x-2">
+                      <span className="text-gray-500 text-lg">
+                        جاري تحميل الطلبات...
+                      </span>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {ordersData?.data.orders.map((order: Order) => (
+              ) : isOrdersError ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center py-5 text-red-500"
+                  >
+                    حدث خطأ أثناء تحميل الطلبات. يرجى المحاولة مرة أخرى.
+                  </TableCell>
+                </TableRow>
+              ) : ordersData?.data.orders.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center py-5 text-gray-500"
+                  >
+                    لا توجد طلبات حتى الآن.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                ordersData?.data.orders.map((order: Order) => (
                   <TableRow key={order._id}>
-                    <TableCell className="text-right">
-                      <Dialog>
+                    <TableCell className="text-center">
+                      <Dialog
+                        open={isDialogOpen}
+                        onOpenChange={(open) => setIsDialogOpen(open)}
+                      >
                         <DialogTrigger asChild>
                           <Button
                             variant="link"
@@ -144,32 +207,40 @@ function Orders() {
                               <div className="grid gap-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <div className="text-right">
-                                    <strong>اسم العميل:</strong>{" "}
-                                    {selectedOrder.user.name}
+                                    <strong>اسم العميل</strong>
+                                    <br /> {selectedOrder?.user.name}
                                   </div>
                                   <div className="text-right">
-                                    <strong>رقم الهاتف:</strong>{" "}
-                                    {selectedOrder.user.phoneNumber}
+                                    <strong>رقم الهاتف</strong>
+                                    <br /> {selectedOrder?.user.phoneNumber}
                                   </div>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <div className="text-right">
                                     <strong>العنوان</strong> <br />{" "}
-                                     <Link href={selectedOrder.address.googleLocation}>{`${selectedOrder.address.street}, ${selectedOrder.address.city}, ${selectedOrder.address.country}`}</Link>
+                                    <Link
+                                      href={
+                                        selectedOrder.address.googleLocation
+                                      }
+                                    >{`${selectedOrder?.address.street}, ${selectedOrder?.address.city}, ${selectedOrder.address.country}`}</Link>
                                   </div>
                                   <div className="text-right">
-                                    <strong>حالة الطلب:</strong>{" "}
-                                    {getStatusText(selectedOrder.status)}
+                                    <strong>حالة الطلب</strong>
+                                    <br />{" "}
+                                    {getStatusText(selectedOrder?.status)}
                                   </div>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <div className="text-right">
                                     <strong>حالة الدفع</strong> <br />{" "}
-                                    {selectedOrder.paymentStatus}
+                                    {getPaymentStatusText(
+                                      selectedOrder?.paymentStatus
+                                    )}
                                   </div>
                                   <div className="text-right">
-                                    <strong>طريقة الدفع:</strong>{" "}
-                                    {selectedOrder.paymentMethod === "COD"
+                                    <strong>طريقة الدفع</strong>
+                                    <br />{" "}
+                                    {selectedOrder?.paymentMethod === "COD"
                                       ? "عند الاستلام"
                                       : "دفع إلكتروني"}
                                   </div>
@@ -178,7 +249,7 @@ function Orders() {
                                   <h3 className="text-lg font-semibold mb-2 text-right">
                                     تفاصيل السلة
                                   </h3>
-                                  <Table>
+                                  <Table dir="rtl">
                                     <TableHeader>
                                       <TableRow>
                                         <TableHead className="text-right">
@@ -193,7 +264,7 @@ function Orders() {
                                       </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                      {selectedOrder.cart.products.map(
+                                      {selectedOrder?.cart.products.map(
                                         (product) => (
                                           <TableRow key={product.productId._id}>
                                             <TableCell className="text-right">
@@ -224,32 +295,38 @@ function Orders() {
                       </Dialog>
                     </TableCell>
                     <TableCell className="text-right">
-                      {new Date(order.createdAt).toLocaleDateString('ar-EG-u-nu-arab')}
+                      {new Date(order.createdAt).toLocaleDateString(
+                        "ar-EG-u-nu-arab"
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       {order.cart.totalPrice} ريال
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       <span
                         className={`px-2 py-1 rounded-full text-nowrap ${getStatusColor(
                           order.status
                         )}`}
                       >
-                        {getStatusText(order.status)}
+                        {getStatusText(order?.status)}
                       </span>
                     </TableCell>
-                    <TableCell className="text-right ">
-                      {order.paymentMethod === "COD"
-                        ? "عند الاستلام"
-                        : "دفع إلكتروني"}
+                    <TableCell className="text-center">
+                      <span
+                        className={`px-2 py-1 rounded-full text-nowrap ${getPaymentStatusColor(
+                          order.paymentStatus
+                        )}`}
+                      >
+                        {getPaymentStatusText(order?.paymentStatus)}
+                      </span>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </>
   );
 }

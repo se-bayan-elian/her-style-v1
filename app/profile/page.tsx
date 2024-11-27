@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { SquarePenIcon, User } from "lucide-react";
 import { deleteCookie } from "cookies-next";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import axiosInstance from "@/utils/axiosInstance";
 import { useDispatch } from "react-redux";
 import { addName, deleteName } from "@/utils/cart";
 import Orders from "./Orders";
-
 
 interface Profile {
   _id: string;
@@ -29,17 +28,17 @@ interface Profile {
   phoneNumber: string;
 }
 
-
 const fetchProfile = async (): Promise<Profile> => {
   const response = await axiosInstance.get("profile");
   return response.data.data;
 };
 
-
-
 export default function ProfilePage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("profile");
+  const query = useSearchParams();
+  const orderId = query.get("orderId");
+  console.log(orderId);
+  const [activeTab, setActiveTab] = useState(query.get("tab") || "profile");
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
 
@@ -61,10 +60,6 @@ export default function ProfilePage() {
     queryFn: fetchProfile,
   });
 
-
-
-
-
   const updateProfileMutation: any = useMutation({
     mutationFn: updateProfile,
     onSuccess: () => {
@@ -80,7 +75,9 @@ export default function ProfilePage() {
     dispatch(deleteName());
     queryClient.invalidateQueries({ queryKey: ["cart"] });
     router.push("/");
-    setTimeout(()=>{location.reload()},1000)
+    setTimeout(() => {
+      location.reload();
+    }, 1000);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -106,7 +103,6 @@ export default function ProfilePage() {
       </div>
     );
   }
-
 
   return (
     <div className="min-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md my-8">
@@ -188,7 +184,7 @@ export default function ProfilePage() {
           </form>
         </TabsContent>
         <TabsContent value="orders" className="w-[80vw] lg:w-auto">
-        <Orders />
+          <Orders defaultId={orderId || ""} />
         </TabsContent>
       </Tabs>
     </div>

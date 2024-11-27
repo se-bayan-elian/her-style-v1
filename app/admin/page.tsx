@@ -33,15 +33,15 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 text-right" dir="rtl">
-      <div className="container mx-auto p-6">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">
+      <div className="container mx-auto md:p-6 py-6 px-1">
+        <div className="flex justify-between items-center mb-8  flex-col md:flex-row">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
             لوحة التحكم الإدارية
           </h1>
           <Button
             onClick={handleSignOut}
             variant="outline"
-            className="flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-800"
+            className="flex items-center gap-2 bg-white hover:bg-gray-100 text-gray-800 mr-auto md:mr-0"
           >
             <LogOut size={18} />
             تسجيل الخروج

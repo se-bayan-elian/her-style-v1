@@ -28,7 +28,9 @@ const addressSlice = createSlice({
   reducers: {
     setAddress: (state:{address : withAddress}, action:PayloadAction<withAddress>) => {
       state.address = action.payload;
-      setCookie('address', JSON.stringify(action.payload))
+      setCookie('address', JSON.stringify(action.payload),{
+        maxAge: 60*60*24*3
+      })
     },
     clearAddress: (state:{address : withAddress}) => {
       state.address = initialState.address; 
