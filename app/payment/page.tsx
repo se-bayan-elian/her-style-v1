@@ -155,9 +155,7 @@ const PayPalPayment = () => {
       setIsPaymentProcessing(false);
     }, 1000);
   };
-  if (isPaymentProcessing) {
-    return <Loading />;
-  }
+
   return (
     <PayPalScriptProvider
       options={{
