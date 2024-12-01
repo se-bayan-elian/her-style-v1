@@ -67,7 +67,7 @@ const PayPalPayment = () => {
 
   const createOrder = async (data: any, actions: any) => {
     setIsPaying(true);
-    const exchangeRate = await getExchangeRate();
+    const exchangeRate = (await getExchangeRate()) || 3.75;
     const usdAmount = parseFloat(
       (cartData?.data?.carts[0]?.totalPrice / exchangeRate).toFixed(2)
     );
