@@ -186,7 +186,9 @@ function Orders({ defaultId }: { defaultId: string }) {
                     <TableCell className="text-center">
                       <Dialog
                         open={isDialogOpen}
-                        onOpenChange={(open) => setIsDialogOpen(open)}
+                        onOpenChange={(open) => {
+                          setIsDialogOpen(open);
+                        }}
                       >
                         <DialogTrigger asChild>
                           <Button

@@ -106,7 +106,7 @@ export default function Cart() {
       </Button>
 
       {isOpen && (
-        <Card className="absolute left-0 top-full mt-2 w-80 z-50">
+        <Card className="absolute left-0 top-full mt-2 md:w-80 w-72 z-50">
           <CardHeader className="flex justify-between items-center">
             <Button
               variant="ghost"
@@ -170,33 +170,32 @@ export default function Cart() {
                   <h3 className="font-medium mb-4 w-full text-center ">
                     ملخص الطلب
                   </h3>
-                  <div className="flex items-center justify-end mb-2">
-                    <span> {data.data.carts[0].totalPrice} ريس : </span>
-                    <span className="ml-1 text-gray-500">مجموع المنتجات</span>
+                  <div className="flex items-center justify-end mb-2 gap-1/2">
+                    <span>ر.س </span>
+                    <span>{data.data.carts[0].totalPrice}</span>
+                    <span className="ml-1 text-gray-500">:مجموع المنتجات</span>
                   </div>
                   <div className="flex flex-col items-end border-t pt-4">
                     <p className="mb-2 ">هل لديك كود خصم ؟</p>
                     <div className="flex items-center mb-2">
                       <Button
-                        className="rounded-r-none bg-purple text-white"
+                        className="rounded-r-none bg-purple text-white w-[67px]"
                         onClick={handleApplyCoupon}
                         disabled={applyCouponMutation.isPending}
                       >
-                        {applyCouponMutation.isPending
-                          ? "جاري التطبيق..."
-                          : "إضافة"}
+                        إضافة
                       </Button>
                       <input
                         type="text"
                         placeholder="ادخل الكود"
-                        className="flex-grow p-1 lg:p-2 border rounded-r-md text-right"
+                        className="flex-grow p-1 h-full lg:p-2 border rounded-r-md text-right"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value)}
                       />
                     </div>
                     {applyCouponMutation.isError && (
-                      <p className="text-red-500 text-sm">
-                        فشل تطبيق الكوبون. يرجى المحاولة مرة أخرى.
+                      <p className="text-red-500 text-sm text-right">
+                        .فشل تطبيق الكوبون. يرجى المحاولة مرة أخرى
                       </p>
                     )}
                     {applyCouponMutation.isSuccess && (
@@ -205,9 +204,10 @@ export default function Cart() {
                       </p>
                     )}
                   </div>
-                  <div className="flex justify-end  font-medium mt-2">
-                    <span>{data.data.carts[0].totalPrice} ريس</span>
-                    <span className="text-gray-500 ml-2">الإجمالي :</span>
+                  <div className="flex justify-end  font-medium mt-2 gap-1/2">
+                    <span>ر.س</span>
+                    <span>{data.data.carts[0].totalPrice}</span>
+                    <span className="text-gray-500 ml-2">: الإجمالي </span>
                   </div>
                 </div>
               </div>

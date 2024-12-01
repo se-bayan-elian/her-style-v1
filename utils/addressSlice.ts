@@ -2,10 +2,10 @@
 // store/addressSlice.js
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { deleteCookie, setCookie } from 'cookies-next';
+import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 
 const initialState = {
-  address: {
+  address: getCookie('address') ? JSON.parse(getCookie('address')?? '') :{
     firstLine: '',
     googleLocation: '',
     street: '',
@@ -14,7 +14,7 @@ const initialState = {
     country: '',
   },
 };
-type withAddress = {
+export type withAddress = {
   firstLine: string,
   googleLocation: string,
   street: string,

@@ -15,8 +15,9 @@ import axiosInstance from "@/utils/axiosInstance";
 import { useDispatch } from "react-redux";
 import { addName, deleteName } from "@/utils/cart";
 import Orders from "./Orders";
+import Loading from "../(components)/Loading";
 
-interface Profile {
+export interface Profile {
   _id: string;
   name: string;
   email: string;
@@ -37,7 +38,6 @@ export default function ProfilePage() {
   const router = useRouter();
   const query = useSearchParams();
   const orderId = query.get("orderId");
-  console.log(orderId);
   const [activeTab, setActiveTab] = useState(query.get("tab") || "profile");
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
@@ -89,11 +89,7 @@ export default function ProfilePage() {
   };
 
   if (isProfileLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>جاري تحميل الملف الشخصي...</p>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (isProfileError) {
@@ -108,8 +104,22 @@ export default function ProfilePage() {
     <div className="min-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md my-8">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="profile">الملف الشخصي</TabsTrigger>
-          <TabsTrigger value="orders">الطلبات</TabsTrigger>
+          <TabsTrigger
+            value="profile"
+            onClick={() => {
+              router.replace("/profile?tab=profile", { scroll: false });
+            }}
+          >
+            الملف الشخصي
+          </TabsTrigger>
+          <TabsTrigger
+            value="orders"
+            onClick={() => {
+              router.replace("/profile?tab=orders", { scroll: false });
+            }}
+          >
+            الطلبات
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
           <div className="flex  items-center justify-end mb-6">

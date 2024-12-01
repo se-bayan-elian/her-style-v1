@@ -65,7 +65,7 @@ const AddressAndPaymentForm = () => {
     const role = localStorage.getItem("role");
 
     if (!token || role !== "CLIENT") {
-      router.push("/");
+      router.replace("/");
     }
   }, [getCookie("auth_token")]);
   const addressMutation = useMutation({
@@ -74,9 +74,11 @@ const AddressAndPaymentForm = () => {
       reset();
       if (data.data.paymentMethod === "COD") {
         dispatch(clearAddress());
-        router.push("/payment/callback?status=completed");
+        router.replace(
+          "/payment/callback?status=completed&orderId=" + data.data._id
+        );
       } else {
-        router.push("/payment");
+        router.replace("/payment");
       }
     },
     onError: () => {
@@ -98,9 +100,9 @@ const AddressAndPaymentForm = () => {
     if (data.paymentMethod === "COD") {
       addressMutation.mutate(data);
     } else if (data.paymentMethod === "BANKAK") {
-      router.push("/payment/bankak");
+      router.replace("/payment/bankak");
     } else {
-      router.push("/payment");
+      router.replace("/payment");
     }
   };
 

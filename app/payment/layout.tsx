@@ -13,7 +13,7 @@ const PaymentLayout = ({ children }: PropsWithChildren) => {
       router.push("/");
     }
   }, [getCookie("auth_token")]);
-  return <div className="">{children}</div>;
+  return <div>{children}</div>;
 };
 
 export default PaymentLayout;
