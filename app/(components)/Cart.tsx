@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ShoppingBag, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import CartItems from "./CartItems";
 import { RootState } from "@/utils/store";
 import axiosInstance from "@/utils/axiosInstance";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export async function getCart() {
   try {
@@ -47,8 +47,9 @@ async function applyCoupon(code: string) {
 export default function Cart() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [isBlock, setIsBlock] = useState(false);
   const [couponCode, setCouponCode] = useState("");
-
+  const path = usePathname();
   const { data, isLoading, error } = useQuery({
     queryKey: ["cart"],
     queryFn: getCart,
@@ -84,6 +85,14 @@ export default function Cart() {
     }
   };
 
+  useEffect(() => {
+    if (path.includes("payment")) {
+      setIsBlock(true);
+    } else {
+      setIsBlock(false);
+    }
+  }, [path]);
+
   return (
     <div className="inline-block relative">
       <Button
@@ -105,7 +114,7 @@ export default function Cart() {
         )}
       </Button>
 
-      {isOpen && (
+      {isOpen && !isBlock && (
         <Card className="absolute left-0 top-full mt-2 md:w-80 w-72 z-50">
           <CardHeader className="flex justify-between items-center">
             <Button

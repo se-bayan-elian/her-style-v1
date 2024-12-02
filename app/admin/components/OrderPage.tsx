@@ -255,7 +255,7 @@ function OrderPage() {
                     <strong>العنوان</strong> <br />{" "}
                     <Link
                       href={selectedOrder.address.googleLocation}
-                    >{`${selectedOrder?.address.street}, ${selectedOrder?.address.city}, ${selectedOrder.address.country}`}</Link>
+                    >{`${selectedOrder?.address.street}, ${selectedOrder.address.postalCode}, ${selectedOrder?.address.city}`}</Link>
                   </div>
                   <div className="text-right">
                     <strong>حالة الطلب</strong>

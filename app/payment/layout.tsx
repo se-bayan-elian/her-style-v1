@@ -10,7 +10,7 @@ const PaymentLayout = ({ children }: PropsWithChildren) => {
     const role = localStorage.getItem("role");
 
     if (!token || role !== "CLIENT") {
-      router.push("/");
+      router.replace("/");
     }
   }, [getCookie("auth_token")]);
   return <div>{children}</div>;

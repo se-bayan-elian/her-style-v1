@@ -10,11 +10,13 @@ import Image from "next/image";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getCart } from "@/app/(components)/Cart";
 import { useEffect } from "react";
+import Loading from "@/app/(components)/Loading";
 
 const PaymentInstructions = () => {
   const router = useRouter();
   const addressCookies = getCookie("address");
   const dispatch = useDispatch();
+
   const {
     data: cart,
     isLoading: cartLoading,
@@ -50,7 +52,7 @@ const PaymentInstructions = () => {
   });
 
   const handleWhatsApp = () => {
-    const whatsappNumber = "+966502663328"; // Replace with your WhatsApp number
+    const whatsappNumber = "+249119226185"; // Replace with your WhatsApp number
     const message = encodeURIComponent(
       "مرحباً، لقد أكملت عملية الدفع. مرفق إيصال الدفع."
     );
@@ -59,49 +61,25 @@ const PaymentInstructions = () => {
   };
   useEffect(() => {
     if (!addressCookies) {
-      router.push("/checkout");
+      router.replace("/checkout");
     }
   }, []);
 
-  if (cartLoading)
-    return (
-      <div className="flex flex-col items-center justify-start pt-40 min-h-screen">
-        <div className="loader"></div>
-        <style jsx>{`
-          .loader {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #564495;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-          }
-
-          @keyframes spin {
-            0% {
-              transform: rotate(0deg);
-            }
-            100% {
-              transform: rotate(360deg);
-            }
-          }
-        `}</style>
-      </div>
-    );
+  if (cartLoading) return <Loading />;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-gray-50 text-right">
-      <h1 className="text-2xl font-bold mb-6">إتمام عملية الدفع</h1>
+      <h1 className="text-2xl font-bold lg:mb-6 mb-3">إتمام عملية الدفع</h1>
       <p
-        className="text-gray-800 text-md md:text-lg mb-2 text-center md:text-right"
+        className="text-gray-800 text-md md:text-lg mb-2 text-center md:text-right flex flex-col md:block"
         dir="rtl"
       >
-        قم بدفع مبلغ{" "}
-        <span className="font-bold">{cart.data.carts[0]?.totalPrice}</span> SAR
-        لأحد الحسابين{" "}
+        <span>قم بدفع ما يعادل مبلغ </span>
+        <span className="font-bold">{cart.data.carts[0]?.totalPrice} SAR</span>
+        <span> لأحد الحسابين </span>
       </p>
       <p
-        className="text-gray-800 text-md md:text-lg  mb-3 text-center md:text-right"
+        className="text-gray-800 text-md md:text-lg  mb-3 text-justify md:text-right"
         dir="rtl"
       >
         وبعدها قم بإرسال الإيصال لرقمنا على الوتساب وأضغط متابعة لإتمام طلبك

@@ -109,14 +109,14 @@ export default function Header() {
         </div>
       )}
 
-      <header className="bg-white text-purple p-4 lg:px-24 flex justify-between items-center">
+      <header className="bg-white text-purple py-4 mx-auto w-[95%] md:w-[90%] lg:w-[80%] flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <Cart />
         </div>
         <div className="relative w-[42%] lg:w-[35%]" ref={recommendationsRef}>
           <input
             type="text"
-            placeholder="...ابحث عن منتج أو موقع"
+            placeholder="...ابحث "
             className="py-1 lg:py-2 p-2 pr-10 pl-4 rounded-md text-black w-full focus:outline-none border-purple border-2 focus:ring-purple text-right"
             value={searchTerm}
             onChange={handleSearchChange}
@@ -208,53 +208,55 @@ export default function Header() {
         </Link>
       </header>
       {/* Navigation */}
-      <nav className="w-full flex items-center bg-purple text-white text-xs lg:text-base text-center py-0 lg:px-24 lg:py-2 p-4">
-        <Login />
-        <div className="hidden lg:flex ml-auto lg:mr-[33%] 2xl:mr-[40%] justify-center space-x-6">
-          <Link href="/about">من نحن</Link>
-          <Link href="/service">سياسة الاستخدام</Link>
-          <Link href="/shop">جميع المنتجات</Link>
-          <Link href="/">الصفحة الرئيسية</Link>
+      <nav className="w-full   bg-purple text-white text-xs lg:text-base text-center  py-0 lg:py-4">
+        <div className="mx-auto flex items-center w-[95%] md:w-[90%] lg:w-[80%]">
+          <Login />
+          <div className="hidden lg:flex ml-auto  justify-center space-x-6 ">
+            <Link href="/about">من نحن</Link>
+            <Link href="/service">سياسة الاستخدام</Link>
+            <Link href="/shop">جميع المنتجات</Link>
+            <Link href="/">الصفحة الرئيسية</Link>
+          </div>
+          <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+            <SheetTrigger asChild className="">
+              <Button variant="ghost" size="icon" className="lg:hidden ml-auto">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="z-[9999999999]">
+              <div className="flex flex-col space-y-4 mt-8 text-right">
+                <Link
+                  href="/"
+                  className="text-lg font-medium"
+                  onClick={handleLinkClick}
+                >
+                  الصفحة الرئيسية
+                </Link>
+                <Link
+                  href="/shop"
+                  className="text-lg font-medium"
+                  onClick={handleLinkClick}
+                >
+                  جميع المنتجات
+                </Link>
+                <Link
+                  href="/service"
+                  className="text-lg font-medium"
+                  onClick={handleLinkClick}
+                >
+                  سياسة الاستخدام
+                </Link>
+                <Link
+                  href="/about"
+                  className="text-lg font-medium"
+                  onClick={handleLinkClick}
+                >
+                  من نحن
+                </Link>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
-        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="lg:hidden ml-auto">
-              <Menu className="h-6 w-6" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right">
-            <div className="flex flex-col space-y-4 mt-8 text-right">
-              <Link
-                href="/"
-                className="text-lg font-medium"
-                onClick={handleLinkClick}
-              >
-                الصفحة الرئيسية
-              </Link>
-              <Link
-                href="/shop"
-                className="text-lg font-medium"
-                onClick={handleLinkClick}
-              >
-                جميع المنتجات
-              </Link>
-              <Link
-                href="/service"
-                className="text-lg font-medium"
-                onClick={handleLinkClick}
-              >
-                سياسة الاستخدام
-              </Link>
-              <Link
-                href="/about"
-                className="text-lg font-medium"
-                onClick={handleLinkClick}
-              >
-                من نحن
-              </Link>
-            </div>
-          </SheetContent>
-        </Sheet>
       </nav>
     </div>
   );

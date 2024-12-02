@@ -11,11 +11,11 @@ const Product: React.FC<ProductProps> = ({ isLoading = false }) => {
   if (isLoading) {
     return (
       <div className="bg-white w-full rounded-lg shadow-md p-4">
-        <Skeleton className="h-[300px] w-full rounded-t-lg mb-4" />
+        <Skeleton className="h-[250px] w-full rounded-t-lg mb-4" />
         <Skeleton className="h-6 w-3/4 mb-2 ml-auto" />
         <div className="flex items-center justify-end mb-2">
           <Skeleton className="h-4 w-8 mr-1" />
-          <div className="flex justify-end">
+          <div className="flex justify-start">
             {[...Array(5)].map((_, i) => (
               <Skeleton key={i} className="w-4 h-4 mr-1" />
             ))}

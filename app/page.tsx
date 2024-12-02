@@ -15,9 +15,7 @@ import { openLogin } from "@/utils/loginSlice";
 import { useDispatch } from "react-redux";
 
 export default function Home() {
-
-  const dispatch = useDispatch()
-
+  const dispatch = useDispatch();
 
   async function getProducts() {
     const { data: products } = await axiosInstance.get("products?tags=green");
@@ -59,7 +57,7 @@ export default function Home() {
   });
 
   return (
-    <main className="container mx-auto pt-3 md:p-8  px-4 lg:px-24">
+    <main className="container mx-auto pt-3 w-[95%] md:w-[90%] lg:w-[80%] ">
       {/* Hero Banner */}
       <Carousel />
       {/* Promotion Banner */}
@@ -71,37 +69,39 @@ export default function Home() {
           height={100}
           width={100}
         />
-        <button dir="rtl" className=" lg:left-80 md:left-60 sm:left-[25%] left-[20%] relative z-10 text-gray-700 font-bold  py-2 flex-col">
-       <p className="flex items-center">عملاء .  <Image src='/bankak.jpg' alt="bankak" height={45} width={45} /> </p>
-       <p className="text-xs">أطلب طلبك ورسل الإيصال... </p>   
-
+        <button
+          dir="rtl"
+          className=" lg:left-80 md:left-60  sm:left-[25%] left-[20%] relative z-10 text-gray-700 font-bold  py-2 flex-col"
+        >
+          <p className="flex items-center">
+            عملاء .{" "}
+            <Image src="/bankak.jpg" alt="bankak" height={45} width={45} />{" "}
+          </p>
+          <p className="text-xs">أطلب طلبك ورسل الإيصال... </p>
         </button>
 
-        <div className=" flex items-center absolute right-0">
+        <div className=" items-center absolute right-0 flex">
           <Image
             src="/products.png"
             alt="Products"
             width={120}
             height={80}
-            className="object-cover"
+            className="object-cover w-[100px] md:w-[120x]"
           />
         </div>
       </div>
 
       {/* Featupurple Products */}
       <section className="mb-12 flex flex-col items-center">
-        <div className="my-4 text-center">
+        <div className="mb-4 text-center">
           <h2 className="text-2xl font-bold  text-purple">
-          قسم المنتجات الغذائية
+            قسم المنتجات الغذائية
           </h2>
-          <h2 className="text-2xl  mb-4 text-black">
-            {" "}
-            تعكس غنى وثقافة السودان
-          </h2>
+          <h2 className="text-lg  mb-4 text-black"> تعكس غنى وثقافة السودان</h2>
         </div>
         <div
           style={{ direction: "rtl" }}
-          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6"
+          className="grid grid-cols-1 w-full sm:grid-cols-2 xl:grid-cols-4 gap-6"
         >
           {[...Array(4)].map((_, index) => (
             <ProductSkelton key={index} isLoading={productsLoading} />
@@ -111,7 +111,6 @@ export default function Home() {
             productsData?.packages.map((product: any, i: number) => (
               <Product
                 id={`/package/${product._id}`}
-                className="w-[250px]"
                 key={product._id}
                 image={product.images[0]}
                 title={product.name}
@@ -120,6 +119,7 @@ export default function Home() {
                 price={product.price.finalPrice}
                 originalPrice={product.price.originalPrice}
                 discount={product.price.discount}
+                className="w-full"
               />
             ))}
 
@@ -127,7 +127,6 @@ export default function Home() {
             productsData?.products.map((product: any, i: number) => (
               <Product
                 id={`/product/${product._id}`}
-                className="w-[250px]"
                 key={product._id}
                 image={product.images[0]}
                 title={product.name}
@@ -136,6 +135,7 @@ export default function Home() {
                 price={product.price.finalPrice}
                 originalPrice={product.price.originalPrice}
                 discount={product.price.discount}
+                className="w-full"
               />
             ))}
           {/* ... Repeat for other products */}
@@ -143,18 +143,18 @@ export default function Home() {
       </section>
 
       {/* Suggested Products Section */}
-      <section className="mb-12 flex flex-col items-center py-4">
+      <section className="mb-5 flex flex-col items-center py-4">
         <div className="text-center">
           <h3 className="text-2xl font-bold text-purple">
             قسم الكريمات والأرياح السودانية الاصيلة
           </h3>
-          <h2 className="text-2xl mb-4 text-black">
+          <h2 className="text-lg mb-4  text-black">
             كريمات وعطور فاخرة من مكونات طبيعية، تعكس عبق التراث السوداني
           </h2>
         </div>
         <div
           style={{ direction: "rtl" }}
-          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6"
+          className="grid  w-full grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6"
         >
           {/* Repeat this product card 4 times */}
 
@@ -167,7 +167,6 @@ export default function Home() {
             packagesData.packages.map((packageItem: any, i: number) => (
               <Product
                 id={`/package/${packageItem._id}`} // Adjusted to use package ID
-                className="w-[250px]"
                 key={packageItem._id}
                 image={packageItem.images[0]} // Adjusted to use package image
                 title={packageItem.name}
@@ -176,6 +175,7 @@ export default function Home() {
                 price={packageItem.price.finalPrice}
                 originalPrice={packageItem.price.originalPrice}
                 discount={packageItem.price.discount}
+                className="w-full"
               />
             ))}
 
@@ -183,7 +183,6 @@ export default function Home() {
             packagesData.products.map((packageItem: any, i: number) => (
               <Product
                 id={`/product/${packageItem._id}`} // Adjusted to use package ID
-                className="w-[250px]"
                 key={packageItem._id}
                 image={packageItem.images[0]} // Adjusted to use package image
                 title={packageItem.name}
@@ -192,6 +191,7 @@ export default function Home() {
                 price={packageItem.price.finalPrice}
                 originalPrice={packageItem.price.originalPrice}
                 discount={packageItem.price.discount}
+                className="w-full"
               />
             ))}
 
@@ -200,7 +200,7 @@ export default function Home() {
       </section>
 
       {/* Newsletter Signup */}
-      <section className="mb-12 ">
+      <section className="mb-5 ">
         <div className="relative rounded-lg overflow-hidden">
           <Image
             src="/sudanImage.png"
@@ -209,34 +209,35 @@ export default function Home() {
             height={300}
             className="w-full object-cover h-64"
           />
-          <div className="absolute inset-0 flex flex-col justify-between  items-center p-2 text-white">
-            <h2 className="lg:text-3xl text-center font-bold mb-12 mt-0 text-black ">
+          <div className="absolute inset-0 z-[50] flex flex-col justify-center  items-center p-2 py-3 text-white">
+            <h2 className="lg:text-xl text-center font-bold mb-4  text-white ">
               في كل زاوية من بلادي، حكاية تُروى، منتجاتنا أصالة، في
               كل قلب تُشوى.
             </h2>
 
             <div className="flex flex-col items-center justify-center ">
-            <p className=" text-nowrap text-center w-fit py-4 text-white font-bold px-6 rounded ">
-            إحساس   + طعم سوداني
-            </p>
-            <p
-              className=" text-black font-bold  underline transition duration-300 hover:cursor-pointer"
-              onClick={()=>dispatch(openLogin(true))}
-            >
-             سجل دخولك هنا
-            </p>
+              <p className=" text-nowrap text-center w-fit mb-3 py-2 bg-purple text-white  px-6 rounded ">
+                إحساس + طعم سوداني
+              </p>
+              <p
+                className=" text-white   underline transition duration-300 hover:cursor-pointer"
+                onClick={() => dispatch(openLogin(true))}
+              >
+                سجل دخولك هنا
+              </p>
             </div>
           </div>
+          <div className="absolute inset-0 bg-purple bg-opacity-50"></div>
         </div>
       </section>
 
       {/* Testimonials */}
       <section className="flex flex-col items-center">
-        <div className="text-center mb-3">
-          <h2 className="text-2xl font-bold mb-4 text-purple">
+        <div className="text-center mb-3 ">
+          <h2 className="text-xl font-bold mb-2 text-purple">
             ماذا قالوا عنا ؟
           </h2>
-          <h2 className="text-2xl font-bold mb-4 text-pink">
+          <h2 className="text-lg mb-4  text-black">
             يمتاز متجرنا بالتقييم الإيجابي من قبل العملاء
           </h2>
         </div>

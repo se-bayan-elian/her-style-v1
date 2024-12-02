@@ -21,6 +21,7 @@ import axiosInstance from "@/utils/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
+import Image from "next/image";
 
 export interface Order {
   _id: string;
@@ -39,6 +40,14 @@ export interface Order {
     totalPrice: number;
     products: {
       productId: {
+        _id: string;
+        name: string;
+      };
+      quantity: number;
+      totalPrice: number;
+    }[];
+    packages: {
+      packageId: {
         _id: string;
         name: string;
       };
@@ -100,10 +109,26 @@ const getPaymentStatusText = (status: string) => {
   switch (status) {
     case "PENDING":
       return "قيد المراجعة";
+
+    case "NOT_PAID":
+      return "قيد المراجعة";
+
     case "SUCCESS":
       return "تم الدفع";
     case "CANCELLED":
       return "ملغي";
+    default:
+      return status;
+  }
+};
+const getPaymentMethodText = (status: string) => {
+  switch (status) {
+    case "COD":
+      return "عند الاستلام";
+    case "BANKAK":
+      return "تطبيق بنكك";
+    case "INSTANT":
+      return "دفع فوري";
     default:
       return status;
   }
@@ -124,15 +149,18 @@ function Orders({ defaultId }: { defaultId: string }) {
 
   const handleOrderClick = (order: Order) => {
     setSelectedOrder(order);
-    setIsDialogOpen(true); // Open the dialog when a specific order is selected
+    setTimeout(() => {
+      console.log(order);
+      setIsDialogOpen(true); // Open dialog after state update
+    }, 0);
   };
   useEffect(() => {
-    if (ordersData?.data && defaultId && !initialRender.current) {
+    if (ordersData?.data && defaultId) {
+      console.log("first");
       const order = ordersData.data.orders.filter(
         (order: any) => order._id === defaultId
       )[0];
       handleOrderClick(order);
-      initialRender.current = true;
     }
   }, [defaultId, ordersData]);
 
@@ -184,117 +212,12 @@ function Orders({ defaultId }: { defaultId: string }) {
                 ordersData?.data.orders.map((order: Order) => (
                   <TableRow key={order._id}>
                     <TableCell className="text-center">
-                      <Dialog
-                        open={isDialogOpen}
-                        onOpenChange={(open) => {
-                          setIsDialogOpen(open);
-                        }}
+                      <Button
+                        variant="link"
+                        onClick={() => handleOrderClick(order)}
                       >
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="link"
-                            onClick={() => handleOrderClick(order)}
-                          >
-                            {order._id}
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[625px]">
-                          <DialogHeader>
-                            <DialogTitle className="text-right">
-                              تفاصيل الطلب
-                            </DialogTitle>
-                          </DialogHeader>
-                          {selectedOrder && (
-                            <ScrollArea className="h-[400px] w-full rounded-md border p-4">
-                              <div className="grid gap-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div className="text-right">
-                                    <strong>اسم العميل</strong>
-                                    <br /> {selectedOrder?.user.name}
-                                  </div>
-                                  <div className="text-right">
-                                    <strong>رقم الهاتف</strong>
-                                    <br /> {selectedOrder?.user.phoneNumber}
-                                  </div>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div className="text-right">
-                                    <strong>العنوان</strong> <br />{" "}
-                                    <Link
-                                      href={
-                                        selectedOrder.address.googleLocation
-                                      }
-                                    >{`${selectedOrder?.address.street}, ${selectedOrder?.address.city}, ${selectedOrder.address.country}`}</Link>
-                                  </div>
-                                  <div className="text-right">
-                                    <strong>حالة الطلب</strong>
-                                    <br />{" "}
-                                    {getStatusText(selectedOrder?.status)}
-                                  </div>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div className="text-right">
-                                    <strong>حالة الدفع</strong> <br />{" "}
-                                    {getPaymentStatusText(
-                                      selectedOrder?.paymentStatus
-                                    )}
-                                  </div>
-                                  <div className="text-right">
-                                    <strong>طريقة الدفع</strong>
-                                    <br />{" "}
-                                    {selectedOrder?.paymentMethod === "COD"
-                                      ? "عند الاستلام"
-                                      : "دفع إلكتروني"}
-                                  </div>
-                                </div>
-                                <div className="col-span-1">
-                                  <h3 className="text-lg font-semibold mb-2 text-right">
-                                    تفاصيل السلة
-                                  </h3>
-                                  <Table dir="rtl">
-                                    <TableHeader>
-                                      <TableRow>
-                                        <TableHead className="text-right">
-                                          المنتج
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                          الكمية
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                          السعر
-                                        </TableHead>
-                                      </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                      {selectedOrder?.cart.products.map(
-                                        (product) => (
-                                          <TableRow key={product.productId._id}>
-                                            <TableCell className="text-right">
-                                              {product.productId.name}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                              {product.quantity}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                              {product.totalPrice} ريال
-                                            </TableCell>
-                                          </TableRow>
-                                        )
-                                      )}
-                                    </TableBody>
-                                  </Table>
-                                  <div className="text-right mt-4 font-bold">
-                                    <strong>
-                                      المجموع الكلي:{" "}
-                                      {selectedOrder.cart.totalPrice} ريال
-                                    </strong>
-                                  </div>
-                                </div>
-                              </div>
-                            </ScrollArea>
-                          )}
-                        </DialogContent>
-                      </Dialog>
+                        {order._id}
+                      </Button>
                     </TableCell>
                     <TableCell className="text-right">
                       {new Date(order.createdAt).toLocaleDateString(
@@ -327,6 +250,123 @@ function Orders({ defaultId }: { defaultId: string }) {
               )}
             </TableBody>
           </Table>
+          {selectedOrder && isDialogOpen && (
+            <Dialog
+              open={isDialogOpen}
+              onOpenChange={(open) => {
+                setIsDialogOpen(open);
+                if (open === false) {
+                  setSelectedOrder(null);
+                }
+              }}
+            >
+              <DialogContent className="sm:max-w-[625px] ">
+                <DialogHeader>
+                  <DialogTitle className="text-right">تفاصيل الطلب</DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="h-[400px] w-full rounded-md border p-4">
+                  <div className="grid gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="text-right">
+                        <strong>اسم العميل</strong>
+                        <br /> {selectedOrder?.user.name}
+                      </div>
+                      <div className="text-right">
+                        <strong>رقم الهاتف</strong>
+                        <br /> {selectedOrder?.user.phoneNumber}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="text-right">
+                        <strong>العنوان</strong> <br />{" "}
+                        <Link
+                          href={selectedOrder?.address?.googleLocation || ""}
+                          target="_blank"
+                        >{`${selectedOrder?.address.street},${selectedOrder?.address.postalCode},${selectedOrder?.address.city} `}</Link>
+                      </div>
+                      <div className="text-right">
+                        <strong>حالة الطلب</strong>
+                        <br /> {getStatusText(selectedOrder?.status || "")}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="text-right">
+                        <strong>حالة الدفع</strong> <br />{" "}
+                        {getPaymentStatusText(
+                          selectedOrder?.paymentStatus || ""
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <strong>طريقة الدفع</strong>
+                        <br />{" "}
+                        {getPaymentMethodText(
+                          selectedOrder?.paymentMethod || ""
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-span-1">
+                      <h3 className="text-lg font-semibold mb-2 text-right">
+                        تفاصيل السلة
+                      </h3>
+                      <Table dir="rtl" className="mb-2">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="text-right">المنتج</TableHead>
+                            <TableHead className="text-right">الكمية</TableHead>
+                            <TableHead className="text-right">السعر</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {selectedOrder?.cart.products.map((product) => (
+                            <TableRow key={product.productId._id}>
+                              <TableCell className="text-right">
+                                {product.productId.name}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {product.quantity}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {product.totalPrice} ريال
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                          {selectedOrder?.cart.packages.map((product) => (
+                            <TableRow key={product.packageId._id}>
+                              <TableCell className="text-right">
+                                {product.packageId.name}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {product.quantity}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                {product.totalPrice} ريال
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+
+                      <div
+                        className="text-right flex flex-col md:flex-row justify-between mb-3 font-bold"
+                        dir="rtl"
+                      >
+                        <strong className="mb-2 md:mb-0">
+                          المجموع الكلي: {selectedOrder?.cart.totalPrice} ريال
+                        </strong>
+                        <Image
+                          width={150}
+                          height={150}
+                          src={"/hwwak-khatem.png"}
+                          alt="hawwak ختم"
+                          className="mr-auto md:mr-0"
+                        ></Image>
+                      </div>
+                    </div>
+                  </div>
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
+          )}
         </CardContent>
       </Card>
     </>

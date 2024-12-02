@@ -37,6 +37,7 @@ const PayPalPayment = () => {
   const [isPaying, setIsPaying] = useState(false);
   const router = useRouter();
   const address = useSelector((state: RootState) => state.address);
+
   const {
     data: profile,
     isLoading: isProfileLoading,
@@ -64,6 +65,11 @@ const PayPalPayment = () => {
   if (isProfileError || isCartError || cartItems.length === 0) {
     router.replace("/");
   }
+  useEffect(() => {
+    if (!address) {
+      router.replace("/checkout");
+    }
+  }, [])
 
   const createOrder = async (data: any, actions: any) => {
     setIsPaying(true);
@@ -104,7 +110,7 @@ const PayPalPayment = () => {
             address_line_2: address.address.street, // Optional
             admin_area_2: address.address.city, // City
             admin_area_1: "", // State/Province
-            postal_code: address.address.postalCode, // ZIP/Postal code
+            postal_code: "12345", // ZIP/Postal code
             country_code: "SA", // ISO country code
           },
         },
@@ -163,8 +169,11 @@ const PayPalPayment = () => {
         currency: "USD",
       }}
     >
-      <div className="min-h-screen  mx-auto  py-5 w-[90%] md:w-[80%] lg:w[50%] xl:w-[35%] ">
-        <div className=" h-[670px] w-full scroll flex justify-center items-center px-3 py-5 overflow-y-auto ">
+      <div className="min-h-screen flex justify-center items-center mx-auto  py-5 w-[90%] md:w-[80%] lg:w[50%] xl:w-[35%] ">
+        <div
+          dir="rtl"
+          className=" h-fit w-full scroll  px-3 py-5 overflow-y-auto "
+        >
           <PayPalButtons
             createOrder={createOrder}
             onApprove={onApprove}
@@ -173,9 +182,11 @@ const PayPalPayment = () => {
             className="w-full"
             style={{
               layout: "vertical", // or "horizontal"
+              tagline: false, // Disable the tagline
               color: "gold", // or "blue", "silver", etc.
               shape: "rect", // or "pill"
               label: "pay", // This makes it look more like a card-style button
+              height: 35,
             }}
           />
         </div>

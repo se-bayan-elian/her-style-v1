@@ -3,9 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 function Footer() {
   return (
-    <footer className="bg-purple text-white py-8 text-right md:px-24 px-2">
-      <div className="container mx-auto grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-12 gap-8">
-        <div className="lg:text-right text-center mx-auto lg:col-span-6 xl:col-span-1">
+    <footer className="bg-purple text-white py-8 text-right  ">
+      <div className="container mx-auto w-[95%] md:w-[90%] lg:w-[80%]  grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-12 gap-8">
+        <div className="lg:text-right text-center mx-auto md:col-span-6 xl:col-span-1">
           <h3 className="font-bold mb-4">طرق الدفع لدينا</h3>
           <div className="flex lg:justify-end justify-center space-x-2 space-x-reverse">
             <Image
@@ -93,7 +93,7 @@ function Footer() {
           <h3 className="font-bold mt-4 mb-2">الإيميل</h3>
           <p className="mt-2">omniamahmmed199@gmail.com</p>
         </div>
-        <div className="text-center lg:text-right mx-auto xl:col-span-1 lg:col-span-6 order-last  mt-4 ">
+        <div className="text-center lg:text-right mx-auto xl:col-span-1 md:col-span-6 order-last  mt-4 ">
           <ul className="space-y-5 mb-5">
             <li>
               <Link href="/">الرئيسية</Link>
@@ -127,7 +127,7 @@ function Footer() {
             </Link>
           </div>
         </div>
-        <div className="flex flex-col lg:col-span-12 xl:col-span-1 xl:order-last order-first  lg:items-end items-center col-span-1 ">
+        <div className="flex flex-col md:col-span-12 xl:col-span-1 xl:order-last order-first  lg:items-end items-center col-span-1 ">
           <Image
             src="/whiteLogo.png"
             alt="Herstyle"

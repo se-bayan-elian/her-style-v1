@@ -68,28 +68,28 @@ const Product: React.FC<ProductProps> = ({
   };
 
   return (
-    <div
-      className={`bg-white rounded-lg shadow-md ${className} w-[250px]  h-fit xl:w-full`}
-    >
-      <div className="relative mb-4 overflow-hidden h-[400px] lg:h-[50vh] xl:h-[55vh]">
+    <div className={`bg-white rounded-lg shadow-md ${className} h-fit w-full`}>
+      <div className="relative overflow-hidden h-[250px]">
         <Link href={`/shop/${id}`}>
           <Image
             src={image}
             alt={title}
             width={200}
             height={200}
-            className="w-full h-full rounded-t-lg"
+            className="w-full h-[250px] rounded-t-lg object-cover "
           />
         </Link>
       </div>
       <div style={{ direction: "ltr" }} className="p-4">
         <Link
           href={`/shop/${id}`}
-          className="hover:text-purple hover:underline"
+          className="hover:text-purple hover:underline "
         >
-          <h3 className="font-bold text-lg mb-2 text-right">{title}</h3>
+          <h3 className="font-bold text-lg mb-2 text-right h-[57px] ">
+            {title}
+          </h3>
         </Link>
-        <div className="flex items-center justify-end mb-2">
+        <div className="flex items-center justify-end mb-2 gap-2">
           <div className="flex flex-row-reverse">
             {[...Array(5)].map((_, i) => (
               <Star

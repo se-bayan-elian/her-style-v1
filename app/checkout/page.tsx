@@ -121,6 +121,7 @@ const AddressAndPaymentForm = () => {
             </Label>
             <Input
               id="firstLine"
+              dir="rtl"
               placeholder="مثال: مبنى رقم 1"
               className="col-span-4 focus-visible:ring-purple-500 text-right"
               {...register("firstLine", { required: "العنوان الأول مطلوب" })}
@@ -143,6 +144,11 @@ const AddressAndPaymentForm = () => {
               className="col-span-4 focus-visible:ring-purple-500 text-right"
               {...register("googleLocation", {
                 required: "رابط الموقع على جوجل مطلوب",
+                pattern: {
+                  value:
+                    /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/[^\s]*)?$/,
+                  message: "يرجى إدخال رابط صحيح",
+                },
               })}
             />
             {errors.googleLocation && (
@@ -159,6 +165,7 @@ const AddressAndPaymentForm = () => {
             </Label>
             <Input
               id="street"
+              dir="rtl"
               placeholder="مثال : شارع الملك فهد"
               className="col-span-4 focus-visible:ring-purple-500 text-right"
               {...register("street", { required: "اسم الشارع مطلوب" })}
@@ -177,6 +184,7 @@ const AddressAndPaymentForm = () => {
             </Label>
             <Input
               id="city"
+              dir="rtl"
               placeholder="مثال : الرياض"
               className="col-span-4 focus-visible:ring-purple-500 text-right"
               {...register("city", { required: "اسم المدينة مطلوب" })}
@@ -191,13 +199,14 @@ const AddressAndPaymentForm = () => {
           {/* Postal Code */}
           <div className="grid grid-cols-4 items-center gap-1">
             <Label htmlFor="postalCode" className="col-span-4 text-right">
-              الرمز البريدي
+              الحي
             </Label>
             <Input
               id="postalCode"
-              placeholder=" مثال : 12345"
+              dir="rtl"
+              placeholder=" مثال : حي المطار"
               className="col-span-4 focus-visible:ring-purple-500 text-right"
-              {...register("postalCode", { required: "الرمز البريدي مطلوب" })}
+              {...register("postalCode", { required: "الحي مطلوب" })}
             />
             {errors.postalCode && (
               <small className="text-red col-span-4 text-right">

@@ -87,12 +87,48 @@ const config: Config = {
   				to: {
   					height: '0'
   				}
-  			}
+  			},
+				'pulse_custom-green': {
+          '0%': {
+            boxShadow: '0 0 0 0 rgba(0, 230, 64, 0.7)',
+          },
+          '70%': {
+            boxShadow: '0 0 0 20px rgba(0, 230, 64, 0)',
+          },
+          '100%': {
+            boxShadow: '0 0 0 0 rgba(0, 230, 64, 0)',
+          },
+        },
+				'pulse_custom-purple': {
+          '0%': {
+            boxShadow: '0 0 0 0 rgba(128, 0, 128, 0.7)',
+          },
+          '70%': {
+            boxShadow: '0 0 0 20px rgba(128, 0, 128, 0)',
+          },
+          '100%': {
+            boxShadow: '0 0 0 0 rgba(128, 0, 128, 0)',
+          },
+        },
+        'bounce_custom': {
+          '0%, 20%, 50%, 80%, 100%': {
+            transform: 'translateY(0)',
+          },
+          '40%': {
+            transform: 'translateY(-10px)',
+          },
+          '60%': {
+            transform: 'translateY(-5px)',
+          },
+        }
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
-  		}
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-purple': 'pulse_custom-purple 1.5s infinite',
+        'pulse-green': 'pulse_custom-green 2s infinite' 
+			},
+		
   	}
   },
   plugins: [require("tailwindcss-animate")],
