@@ -3,7 +3,7 @@ import React from "react";
 function page() {
   return (
     <section dir="rtl" className="text-right flex justify-center items-center ">
-      <div className="bg-white shadow-lg rounded-lg  mx-auto  w-[95%] md:w-[90%] lg:w-[80%] pm-5 pt-4">
+      <div className="bg-white shadow-lg rounded-lg  mx-auto  w-[95%] md:w-[90%] lg:w-[80%] my-10 p-6">
         <h1 className="text-2xl font-bold mb-4">من نحن</h1>
         <p className="mb-4">
           مرحبًا بكم في "hawaak"، وجهتكم الموثوقة لشراء المنتجات الزراعية والعطور والكريمات السودانية الأصيلة. نحن هنا لنتشارك معكم ثروات السودان الطبيعية ونقدم لكم أفضل ما تقدمه بلادنا من منتجات.
