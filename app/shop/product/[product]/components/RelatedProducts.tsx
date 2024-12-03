@@ -95,7 +95,7 @@ function RelatedProducts({ data }: { data: any }) {
               </div>
             </div>
 
-            <p className="text-justify text-sm text-gray-600 mb-4" dir="rtl">
+            <p className="text-justify text-sm text-gray-600 mb-4 whitespace-pre-wrap" dir="rtl">
               {item.description.length > 350
                 ? `${item.description.slice(0, 350)}...`
                 : item.description}
