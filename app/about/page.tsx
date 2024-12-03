@@ -2,7 +2,7 @@ import React from "react";
 
 function page() {
   return (
-    <section dir="rtl" className="text-right flex justify-center items-center ">
+    <section dir="rtl" className="text-right">
       <div className="bg-white shadow-lg rounded-lg  mx-auto  w-[95%] md:w-[90%] lg:w-[80%] my-10 p-6">
         <h1 className="text-2xl font-bold mb-4">من نحن</h1>
         <p className="mb-4">
