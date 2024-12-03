@@ -263,7 +263,7 @@ const AddressAndPaymentForm = () => {
           disabled={addressMutation.isPending && !addressMutation.isError}
         >
           {addressMutation.isPending && !addressMutation.isError
-            ? "جاري الطلب..."
+            ? "...جاري الطلب"
             : "تأكيد الطلب"}
         </Button>
       </form>

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -26,6 +26,8 @@ import { addName } from "@/utils/cart";
 import { RootState } from "@/utils/store";
 import axios from "axios";
 import { openLogin } from "@/utils/loginSlice";
+import GeneralAlert from "./Alert";
+import { toast } from "@/hooks/use-toast";
 
 type LoginFormData = {
   email: string;
@@ -39,9 +41,9 @@ type ForgotPasswordFormData = {
 
 const loginUser = async (data: LoginFormData) => {
   try {
-    const response = await axiosInstance.post('/users/login', data);
-    console.log(data)
-    return response.data;
+    const response = await axiosInstance.post("/users/login", data);
+
+    return response?.data;
   } catch (error) {
     throw error;
   }
@@ -49,7 +51,10 @@ const loginUser = async (data: LoginFormData) => {
 
 const resetPassword = async (data: ForgotPasswordFormData) => {
   try {
-    const response = await axios.post('https://herstyleapi.onrender.com/api/v1/users/reset-password-link', data);
+    const response = await axios.post(
+      "https://herstyleapi.onrender.com/api/v1/users/reset-password-link",
+      data
+    );
     return response.data;
   } catch (error) {
     throw error;
@@ -57,54 +62,79 @@ const resetPassword = async (data: ForgotPasswordFormData) => {
 };
 
 export function Login() {
-  const queryClient = useQueryClient()
-  const dispatch = useDispatch()
-  const isOpen = useSelector((state:RootState)=>state.login.open)
+  const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+  const isOpen = useSelector((state: RootState) => state.login.open);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<LoginFormData>();
-  const { register: registerForgotPassword, handleSubmit: handleSubmitForgotPassword, formState: { errors: forgotPasswordErrors }, reset: resetForgotPassword } = useForm<ForgotPasswordFormData>();
-  const [error, setError] = useState("")
-  const [forgotPasswordMessage, setForgotPasswordMessage] = useState("")
-  const user = useSelector((state: RootState) => state.user.name)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<LoginFormData>();
+  const {
+    register: registerForgotPassword,
+    handleSubmit: handleSubmitForgotPassword,
+    formState: { errors: forgotPasswordErrors },
+    reset: resetForgotPassword,
+  } = useForm<ForgotPasswordFormData>();
+  const [error, setError] = useState("");
+  const [forgotPasswordMessage, setForgotPasswordMessage] = useState("");
+  const user = useSelector((state: RootState) => state.user.name);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user') || "";
+    const storedUser = localStorage.getItem("user") || "";
     dispatch(addName(storedUser));
   }, []);
 
   const loginMutation = useMutation({
     mutationFn: loginUser,
+    onMutate: () => {
+      setError("");
+    },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] })
-      setCookie('auth_token', data.accessToken, {
+      console.log("from success");
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      setCookie("auth_token", data.accessToken, {
         maxAge: 30 * 24 * 60 * 60,
-        path: '/',
-        sameSite: 'strict'
+        path: "/",
+        sameSite: "strict",
       });
-      dispatch(openLogin(false))
-      localStorage.setItem('user', data.user.name);
-      localStorage.setItem('role', data.user.role);
-      reset()
+      dispatch(openLogin(false));
+      localStorage.setItem("user", data.user.name);
+      localStorage.setItem("role", data.user.role);
+      reset();
       dispatch(addName(data.user.name));
     },
-    onError: (error) => {
-      console.error('Login failed', error);
-      setError("بيانات الاعتماد خاطئة");
-      reset()
+    onError: (error: any) => {
+      if (error.response.status === 403) {
+        setError("يرجى تفعيل بريدك الإلكتروني");
+      } else setError("بيانات الاعتماد خاطئة");
+      reset();
     },
   });
 
   const resetPasswordMutation = useMutation({
     mutationFn: resetPassword,
+    onMutate: () => {
+      setForgotPasswordMessage("");
+    },
     onSuccess: (data) => {
-      setForgotPasswordMessage("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني");
-      resetForgotPassword()
+      toast({
+        title: "نجاح",
+        description: "راجع بريدك الإلكتروني لإعادة تعيين كلمة مرورك",
+        // يمكنك إضافة المزيد من الخصائص هنا إذا لزم الأمر
+      });
+      resetForgotPassword();
+      setIsForgotPasswordOpen(false);
     },
     onError: (error) => {
-      console.error('Password reset failed', error);
-      setForgotPasswordMessage("فشل إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى");
-      resetForgotPassword()
+      console.error("Password reset failed", error);
+      setForgotPasswordMessage(
+        "فشل إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى"
+      );
+      resetForgotPassword();
     },
   });
 
@@ -120,7 +150,12 @@ export function Login() {
     <>
       <Dialog open={isOpen} onOpenChange={(open) => dispatch(openLogin(open))}>
         {user ? (
-          <Link href={`/${localStorage.getItem('role') === "OWNER" ? "admin" : "profile"}`} className="flex items-center">
+          <Link
+            href={`/${
+              localStorage.getItem("role") === "OWNER" ? "admin" : "profile"
+            }`}
+            className="flex items-center"
+          >
             <User className="text-white mr-2" size={20} />
             <span className="text-white font-semibold">{user}</span>
           </Link>
@@ -131,23 +166,31 @@ export function Login() {
             </button>
           </DialogTrigger>
         )}
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader className="flex justify-between items-end">
+        <DialogContent className="sm:max-w-[425px] gap-1">
+          <DialogHeader className="flex justify-between items-end mb-0">
             <DialogTitle>دخول</DialogTitle>
             <DialogDescription className="text-right">
-              قم بإدخال بيانات تسجيل الدخول الخاصة بك هنا. انقر على دخول عند الانتهاء.
+              .قم بإدخال بيانات تسجيل الدخول الخاصة بك هنا
             </DialogDescription>
           </DialogHeader>
+          {error && <GeneralAlert type="error" message={error} />}
+
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid gap-4 pm-4 pt-2 mb-2">
+              <div className="grid grid-cols-4 items-center gap-4 ">
                 <Input
                   id="email"
                   placeholder="البريد الإلكتروني"
                   className="col-span-4 focus-visible:ring-purple-500 text-right"
-                  {...register("email", { required: "البريد الإلكتروني مطلوب" })}
+                  {...register("email", {
+                    required: "البريد الإلكتروني مطلوب",
+                  })}
                 />
-                {errors.email && <span className="text-red col-span-4 text-right">{errors.email.message}</span>}
+                {errors.email && (
+                  <span className="text-red text-sm col-span-4 text-right">
+                    {errors.email.message}
+                  </span>
+                )}
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Input
@@ -157,33 +200,43 @@ export function Login() {
                   className="col-span-4 focus-visible:ring-purple-500 text-right text-nowrap"
                   {...register("password", { required: "كلمة المرور مطلوبة" })}
                 />
-                {errors.password && <span className="text-red col-span-4 text-right">{errors.password.message}</span>}
+                {errors.password && (
+                  <span className="text-red text-sm col-span-4 text-right">
+                    {errors.password.message}
+                  </span>
+                )}
               </div>
               <div className="flex items-center justify-between w-full">
                 <button
                   type="button"
                   className="text-purple text-sm"
                   onClick={() => {
-                    dispatch(openLogin(false))
+                    dispatch(openLogin(false));
                     setIsForgotPasswordOpen(true);
                   }}
                 >
                   نسيت كلمة المرور؟
                 </button>
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                  <Label htmlFor="IsPersistent" className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  <Label
+                    htmlFor="IsPersistent"
+                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
                     تذكرني
                   </Label>
                   <Checkbox id="IsPersistent" {...register("IsPersistent")} />
                 </div>
               </div>
-              {error && <p className="text-red">{error}</p>}
             </div>
             <DialogFooter>
               <div className="w-full">
                 <div>
-                  <Button type="submit" className="bg-purple text-white px-4 py-2 rounded w-full" disabled={loginMutation.isPending}>
-                    {loginMutation.isPending ? 'جاري الدخول...' : 'دخول'}
+                  <Button
+                    type="submit"
+                    className="bg-purple text-white px-4 py-2 rounded w-full"
+                    disabled={loginMutation.isPending}
+                  >
+                    {loginMutation.isPending ? "...جاري الدخول" : "دخول"}
                   </Button>
                 </div>
                 <button
@@ -199,14 +252,20 @@ export function Login() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isForgotPasswordOpen} onOpenChange={setIsForgotPasswordOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+      <Dialog
+        open={isForgotPasswordOpen}
+        onOpenChange={setIsForgotPasswordOpen}
+      >
+        <DialogContent className="sm:max-w-[425px] gap-1">
           <DialogHeader className="flex justify-between items-end">
             <DialogTitle>نسيت كلمة المرور</DialogTitle>
             <DialogDescription className="text-right">
               أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور.
             </DialogDescription>
           </DialogHeader>
+          {forgotPasswordMessage && (
+            <GeneralAlert type="error" message={forgotPasswordMessage} />
+          )}
           <form onSubmit={handleSubmitForgotPassword(onSubmitForgotPassword)}>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
@@ -214,22 +273,36 @@ export function Login() {
                   id="forgotPasswordEmail"
                   placeholder="البريد الإلكتروني"
                   className="col-span-4 focus-visible:ring-purple-500 text-right"
-                  {...registerForgotPassword("email", { required: "البريد الإلكتروني مطلوب" })}
+                  {...registerForgotPassword("email", {
+                    required: "البريد الإلكتروني مطلوب",
+                  })}
                 />
-                {forgotPasswordErrors.email && <span className="text-red col-span-4 text-right">{forgotPasswordErrors.email.message}</span>}
+                {forgotPasswordErrors.email && (
+                  <span className="text-red col-span-4 text-right">
+                    {forgotPasswordErrors.email.message}
+                  </span>
+                )}
               </div>
-              {forgotPasswordMessage && <p className="text-green-500">{forgotPasswordMessage}</p>}
             </div>
             <DialogFooter>
-              <Button type="submit" className="bg-purple text-white px-4 py-2 rounded w-full" disabled={resetPasswordMutation.isPending}>
-                {resetPasswordMutation.isPending ? 'جاري الإرسال...' : 'إرسال رابط إعادة التعيين'}
+              <Button
+                type="submit"
+                className="bg-purple text-white px-4 py-2 rounded w-full"
+                disabled={resetPasswordMutation.isPending}
+              >
+                {resetPasswordMutation.isPending
+                  ? "...جاري الإرسال"
+                  : "إرسال رابط إعادة التعيين"}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      <Signup isSignupOpen={isSignupOpen} setIsSignupOpen={() => setIsSignupOpen(false)} />
+      <Signup
+        isSignupOpen={isSignupOpen}
+        setIsSignupOpen={() => setIsSignupOpen(false)}
+      />
     </>
   );
 }

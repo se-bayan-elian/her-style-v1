@@ -117,7 +117,7 @@ function Page() {
   } = useInfiniteQuery({
     queryKey: ["packages", priceRange, stars, isOnlyProducts],
     queryFn: fetchPackages,
-    enabled: isOnlyPackages || areProductsExhausted,
+    enabled: isOnlyPackages || (!isOnlyPackages && !hasNextProducts),
     getNextPageParam: (lastPage, pages) => {
       const currentPage = lastPage.data.data.options.page;
       const totalPages = Math.ceil(
@@ -127,14 +127,6 @@ function Page() {
     },
     initialPageParam: 1,
   });
-
-  // Use effect to manage products exhaustion
-  useEffect(() => {
-    if (productsData && !isOnlyPackages) {
-      const isExhausted = !hasNextProducts;
-      setAreProductsExhausted(isExhausted);
-    }
-  }, [productsData, hasNextProducts, isOnlyPackages]);
 
   // Reset exhaustion when filters change
   useEffect(() => {
@@ -168,9 +160,9 @@ function Page() {
   };
 
   return (
-    <div className="shop-container w-full  mx-auto px-4 lg:px-24 py-8">
+    <div className="shop-container  mx-auto w-[95%] md:w-[90%] lg:w-[80%] py-4">
       <div className="shop-header"></div>
-      <div className="shop-actions p-4 w-full flex justify-end gap-4">
+      <div className="shop-actions mb-2 w-full flex justify-end gap-4">
         <MobileFilterSection
           filter={filter}
           onlyPackages={handleOnlyPackages}
@@ -179,7 +171,7 @@ function Page() {
           handleRatingFilter={handleStarsChange}
         />
       </div>
-      <div className="shop-content flex w-full flex-1">
+      <div className="shop-content flex w-full flex-1 gap-5 py-3">
         <ProductGrid
           packages={
             isOnlyPackages || areProductsExhausted

@@ -209,14 +209,13 @@ export default function Home() {
             height={300}
             className="w-full object-cover h-64"
           />
-          <div className="absolute inset-0 z-[50] flex flex-col justify-center  items-center p-2 py-3 text-white">
+          <div className="absolute inset-0 z-[50] flex flex-col justify-between  items-center p-2 py-3 text-white">
             <h2 className="lg:text-xl text-center font-bold mb-4  text-white ">
-              في كل زاوية من بلادي، حكاية تُروى، منتجاتنا أصالة، في
-              كل قلب تُشوى.
+              في كل زاوية من بلادي، حكاية تُروى، منتجاتنا أصالة، في كل قلب تُشوى
             </h2>
 
-            <div className="flex flex-col items-center justify-center ">
-              <p className=" text-nowrap text-center w-fit mb-3 py-2 bg-purple text-white  px-6 rounded ">
+            <div className="flex flex-col items-center justify-between ">
+              <p className=" text-nowrap text-center w-fit mb-3 py-2 bg-purple  text-white  px-6 rounded ">
                 إحساس + طعم سوداني
               </p>
               <p

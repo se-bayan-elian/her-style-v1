@@ -136,7 +136,7 @@ function Footer() {
             objectFit="cover"
             className="mb-3 mx-auto "
           />
-          <p dir="rtl" className="xl:text-justify text-center w-full ">
+          <p dir="rtl" className="text-justify  w-full ">
             هي منصة المنتجات والعطور السودانية وهي وجهة مميزة تهدف إلى تسليط
             الضوء على المنتجات المحلية والعطور التقليدية التي تتميز بها السودان.
             تبرز هذه المنصة الحرف اليدوية والفنون التقليدية، كما تسعى لدعم

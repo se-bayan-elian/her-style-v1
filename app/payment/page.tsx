@@ -54,7 +54,11 @@ const PayPalPayment = () => {
     queryKey: ["cart"],
     queryFn: getCart,
   });
-
+  useEffect(() => {
+    if (!address) {
+      router.replace("/checkout");
+    }
+  }, []);
   // Ensure cart is loaded before rendering PayPal buttons
   if (isCartLoading || isProfileLoading) return <Loading />;
   const cartItems =
@@ -65,11 +69,6 @@ const PayPalPayment = () => {
   if (isProfileError || isCartError || cartItems.length === 0) {
     router.replace("/");
   }
-  useEffect(() => {
-    if (!address) {
-      router.replace("/checkout");
-    }
-  }, [])
 
   const createOrder = async (data: any, actions: any) => {
     setIsPaying(true);
@@ -100,7 +99,10 @@ const PayPalPayment = () => {
           phone: {
             phone_type: "MOBILE", // Specify phone type: MOBILE, HOME, WORK, etc.
             phone_number: {
-              national_number: profile?.phoneNumber,
+              national_number: profile?.phoneNumber.slice(
+                1,
+                profile?.phoneNumber.length
+              ),
               value: profile?.phoneNumber,
               // Replace with the actual number
             },

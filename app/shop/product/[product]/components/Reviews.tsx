@@ -71,8 +71,8 @@ export default function Reviews({
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       {comments.length === 0 ? (
-        <div className="h-[50vh] flex items-center justify-center">
-          <p className="text-gray-500 text-center">لا توجد تعليقات بعد.</p>
+        <div className="max-h-[50vh] min-h-[150px]  flex items-center justify-center overflow-auto ">
+          <p className="text-gray-500 text-center">لا توجد تعليقات بعد</p>
         </div>
       ) : (
         <div
@@ -140,7 +140,7 @@ export default function Reviews({
           rows={4}
           value={newComment}
           onChange={handleCommentChange}
-          placeholder="اكتب تعليقك هنا..."
+          placeholder="... اكتب تعليقك هنا"
           required
         />
         <button

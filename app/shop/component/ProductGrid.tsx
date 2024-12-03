@@ -23,7 +23,7 @@ function ProductGrid({
     <div className="min-h-screen w-full">
       <div
         style={{ direction: "rtl" }}
-        className="product-grid w-full grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 p-6 justify-items-center"
+        className="product-grid w-full grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 mb-4 justify-items-center"
       >
         {products.length === 0 && packages.length === 0 && !isLoading && (
           <div className="h-full w-full flex items-center justify-center md:col-span-2 lg:col-span-3">

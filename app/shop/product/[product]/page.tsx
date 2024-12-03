@@ -15,21 +15,18 @@ import Reviews from "./components/Reviews";
 import RecommendedProducts from "./components/RecommendedProducts";
 import SingleProductSkeleton from "../../component/SingleProductSkeleton";
 
-
-
-import { opacity } from '@cloudinary/url-gen/actions/adjust';
-import { source } from '@cloudinary/url-gen/actions/overlay';
-import { Position } from '@cloudinary/url-gen/qualifiers';
-import { text } from '@cloudinary/url-gen/qualifiers/source';
-import { TextStyle } from '@cloudinary/url-gen/qualifiers/textStyle';
-import { compass } from '@cloudinary/url-gen/qualifiers/gravity';
-import { Cloudinary, Transformation } from '@cloudinary/url-gen';
-
-
+import { opacity } from "@cloudinary/url-gen/actions/adjust";
+import { source } from "@cloudinary/url-gen/actions/overlay";
+import { Position } from "@cloudinary/url-gen/qualifiers";
+import { text } from "@cloudinary/url-gen/qualifiers/source";
+import { TextStyle } from "@cloudinary/url-gen/qualifiers/textStyle";
+import { compass } from "@cloudinary/url-gen/qualifiers/gravity";
+import { Cloudinary, Transformation } from "@cloudinary/url-gen";
 
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
+import Link from "next/link";
 
 const addToCartMutation = async (productId: string) => {
   const response = await axiosInstance.post(`cart/add-product/${productId}`, {
@@ -111,33 +108,42 @@ export default function ProductPage({
   };
 
   return (
-    <div className="container mx-auto lg:px-24 px-4 py-8">
-      <div className="flex items-center justify-between mb-4">
+    <div className="container mx-auto  w-[95%] md:w-[90%] lg:w-[80%] pm-5 pt-4">
+      <div className="flex flex-col-reverse gap-3 md:gap-0 md:flex-row items-center justify-between mb-4">
         <Button
           onClick={handleShare}
-          className="text-purple bg-white flex items-center gap-2 border border-purple hover:bg-purple-100"
+          className="text-purple mr-auto md:mr-0 bg-white flex items-center gap-1 border border-purple hover:bg-purple-100"
         >
           مشاركة
           <Share2 />
         </Button>
-        <p className="text-gray-600 md:text-base text-xs text-right">
-          الرئيسية / المتجر / {data.name}
+        <p className="text-gray-600 ml-auto md:ml-0  md:mb-0 md:text-base text-base text-right">
+          <Link className="text-black" href="/">
+            الرئيسية
+          </Link>{" "}
+          /{" "}
+          <Link href="/shop" className="text-black">
+            المتجر
+          </Link>{" "}
+          / {data.name}
         </p>
       </div>
       <div className="h-fit flex flex-col-reverse lg:flex-row gap-8">
         <div className="lg:w-1/2 flex flex-col items-end">
           <div className="bg-gray-100 p-4 rounded-lg mb-6 w-full">
-            <div className="flex justify-between items-center">
-              <span className="text-3xl font-bold text-purple-600 text-nowrap">
-                {data.price.finalPrice} ر.س
+            <div className="flex justify-between items-center mb-2">
+              <span
+                dir="rtl"
+                className="text-xl font-bold text-purple text-nowrap flex justify-center items-center gap-2"
+              >
+                <span>{data.price.finalPrice} </span>
+                <span>ر.س</span>
               </span>
-              <h1 className="text-2xl font-bold mb-2 text-right">
-                {data.name}
-              </h1>
+              <h1 className="text-xl font-bold  text-right">{data.name}</h1>
             </div>
             <div className="flex justify-between items-center py-2">
               <div className="text-right">
-                <div className="flex items-center justify-end mt-1">
+                <div className="flex items-center justify-end ">
                   <span className="mr-2 text-sm text-red-500">
                     %
                     {100 -
@@ -146,12 +152,16 @@ export default function ProductPage({
                       )}{" "}
                     خصم
                   </span>
-                  <span className="text-sm line-through text-gray-500">
-                    {data.price.originalPrice} ر.س
+                  <span
+                    dir="rtl"
+                    className="text-sm line-through text-gray-500 flex justify-center items-center gap-2"
+                  >
+                    <span>{data.price.originalPrice}</span>
+                    <span>ر.س</span>
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-end mb-2">
+              <div className="flex items-center justify-end ">
                 <div className="flex flex-row-reverse">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -167,9 +177,11 @@ export default function ProductPage({
               </div>
             </div>
           </div>
-          <div className="bg-gray-100 p-4 rounded-lg mb-6 w-full">
-            <h3 className="font-semibold mb-2 text-right">تفاصيل المجموعة</h3>
-            <p className="text-right text-gray-700">{data.description}</p>
+          <div className="bg-gray-100 p-4 rounded-lg mb-6 w-full lg:hidden ">
+            <h3 className="font-semibold mb-2 text-right">تفاصيل المنتج</h3>
+            <p dir="rtl" className="text-justify text-gray-700 ">
+              {data.description}
+            </p>
           </div>
           {data.availableQuantity ? (
             <button
@@ -177,7 +189,7 @@ export default function ProductPage({
               className="flex items-center justify-center w-full bg-purple text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-300"
             >
               <span className="ml-2">
-                {mutation.isPending ? "جاري الإضافة..." : "إضافة للسلة"}
+                {mutation.isPending ? "... جاري الإضافة" : "إضافة للسلة"}
               </span>
               <ShoppingBag className="ml-2 w-5 h-5" />
             </button>
@@ -191,32 +203,40 @@ export default function ProductPage({
             </button>
           )}
         </div>
-        <div className="h-full w-full lg:w-1/2">
+        <div className="h-full w-full lg:w-1/2 lg:mb-5 ">
           <Swiper
             modules={[Pagination]}
             spaceBetween={30}
             slidesPerView={1}
             pagination={{ clickable: true }}
-            className="w-full  h-[450px] sm:h-[650px] lg:h-[650px] rounded-lg"
+            className="w-full h-[250px]  md:h-[380px] lg:h-[400px] rounded-lg"
           >
             {productData.data.product.images.map(
               (image: string, index: number) => {
-
-                return <SwiperSlide key={index}>
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={image}
-                      alt={`Product image ${index}`}
-                      layout="fill"
-                      className="w-full h-full cursor-pointer"
-                      onClick={() => setFullScreenImage(image)}
-                    />
-                  </div>
-                </SwiperSlide>
+                return (
+                  <SwiperSlide key={index}>
+                    <div className="relative w-full h-full rounded-md">
+                      <Image
+                        src={image}
+                        alt={`Product image ${index}`}
+                        layout="fill"
+                        className="w-full  cursor-pointer"
+                        objectFit="cover"
+                        onClick={() => setFullScreenImage(image)}
+                      />
+                    </div>
+                  </SwiperSlide>
+                );
               }
             )}
           </Swiper>
         </div>
+      </div>
+      <div className="bg-gray-100 p-4 rounded-lg  w-full hidden lg:block ">
+        <h3 className="font-semibold mb-2 text-right">تفاصيل المنتج</h3>
+        <p dir="rtl" className="text-justify text-gray-700 ">
+          {data.description}
+        </p>
       </div>
 
       {/* Full-screen image modal */}
@@ -247,7 +267,7 @@ export default function ProductPage({
       )}
 
       {/* New section for related products and reviews */}
-      <div className="mt-16">
+      <div className="mt-10">
         <div className="flex justify-center mb-6">
           <button
             className={`py-2 rounded-full border-2 border-purple w-40 bg-purple text-white`}
@@ -265,7 +285,7 @@ export default function ProductPage({
         <div className="flex flex-col mt-8">
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold text-purple">منتجات قد تعجبك</h1>
-            <h2 className="text-lg text-gray-600">
+            <h2 className="text-lg text-black">
               اختاري منتجك الراقي من متجرنا
             </h2>
           </div>

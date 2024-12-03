@@ -23,14 +23,20 @@ axiosInstance.interceptors.request.use(
 
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error:any) => {
-    if(error.status === 401){
-      localStorage.removeItem("user")
-      localStorage.removeItem("role")
-      deleteCookie("auth_token")
+  (response) => response, // Handle successful responses
+  async (error: any) => {
+    // Check if the error response exists and the status is 401 (Unauthorized)
+    if (error.response && error.response.status === 401) {
+      // Remove user-related data from localStorage and cookies
+      localStorage.removeItem('user');
+      localStorage.removeItem('role');
+      
+      // Make sure you are using the correct method to delete the cookie
+      deleteCookie('auth_token'); // Make sure 'auth_token' is the correct cookie name
     }
-  }
-);
+
+    // Return the error to propagate it
+    return Promise.reject(error);
+  })
 
 export default axiosInstance;

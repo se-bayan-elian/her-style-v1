@@ -1,8 +1,10 @@
 import React from "react";
 
-function Loading() {
+function Loading({ className }: { className?: string }) {
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div
+      className={`min-h-screen flex items-center justify-center ${className}`}
+    >
       <div className="relative flex items-center justify-center">
         <img
           src="/LOGO1-02.png" // Replace with your image path

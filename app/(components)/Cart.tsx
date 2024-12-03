@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ShoppingBag, Trash2, X } from "lucide-react";
+import { Lock, ShoppingBag, ShoppingCart, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,9 @@ import { RootState } from "@/utils/store";
 import axiosInstance from "@/utils/axiosInstance";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import Loading from "./Loading";
+import CartItemsSkeleton from "./cartItemSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export async function getCart() {
   try {
@@ -128,17 +131,49 @@ export default function Cart() {
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center min-h-[200px]">
             {isLoading ? (
-              <p className="p-4 w-full text-center">Loading...</p>
+              <>
+                {Array.of(2, 0).map((item, index) => {
+                  return <CartItemsSkeleton key={`cart-skeleton-${index}`} />;
+                })}
+                <div className="border-t pt-4 w-full">
+                  <Skeleton className="h-6 w-1/2 mb-4 mx-auto" />
+                  <div className="flex items-center justify-end mb-2 gap-1/2">
+                    <Skeleton className="h-4 w-10" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-20 ml-2" />
+                  </div>
+                  <div className="flex flex-col items-end border-t pt-4">
+                    <Skeleton className="h-4 w-40 mb-2" />
+                    <div className="flex items-center mb-2 gap-2 w-full">
+                      <Skeleton className="h-8 w-[67px]" />
+                      <Skeleton className="h-8 flex-grow rounded-r-md" />
+                    </div>
+                    <Skeleton className="h-4 w-40 mb-2" />
+                  </div>
+                  <div className="flex justify-end  mb-2 first-line:font-medium mt-2 gap-1/2">
+                    <Skeleton className="h-4 w-10" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-20 ml-2" />
+                  </div>
+                </div>
+                <Skeleton className="h-10 w-full mb-2" />
+              </>
             ) : error ? (
-              <p className="text-purple w-full text-center">
-                عليك تسجيل الدخول أولاً!
-              </p>
+              <div className="w-full">
+                <Lock className="h-12 w-12 text-gray-500 mx-auto" />
+                <p className="text-center text-gray-600 text-lg font-medium">
+                  !عليك تسجيل الدخول أولاً
+                </p>
+                <p className="text-center text-gray-500 text-sm">
+                  يرجى تسجيل الدخول للوصول إلى هذه الصفحة
+                </p>
+              </div>
             ) : cartItems.length > 0 ? (
               <div className="w-full ">
                 <div
                   className={`${
                     cartItems.length > 2
-                      ? "overflow-y-scroll h-72"
+                      ? "overflow-y-scroll h-[180px]"
                       : "overflow-y-clip h-fit"
                   }  overflow-hidden cart-items p-0 m-0`}
                 >
@@ -188,7 +223,7 @@ export default function Cart() {
                     <p className="mb-2 ">هل لديك كود خصم ؟</p>
                     <div className="flex items-center mb-2">
                       <Button
-                        className="rounded-r-none bg-purple text-white w-[67px]"
+                        className="rounded-r-none bg-purple text-white"
                         onClick={handleApplyCoupon}
                         disabled={applyCouponMutation.isPending}
                       >
@@ -197,7 +232,7 @@ export default function Cart() {
                       <input
                         type="text"
                         placeholder="ادخل الكود"
-                        className="flex-grow p-1 h-full lg:p-2 border rounded-r-md text-right"
+                        className="w-[70%] p-1 h-full  border rounded-r-md text-right"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value)}
                       />
@@ -221,9 +256,15 @@ export default function Cart() {
                 </div>
               </div>
             ) : (
-              <p className="text-gray-500 w-full text-center">
-                لا يوجد منتجات في السلة
-              </p>
+              <>
+                <ShoppingCart className="h-12 w-12 text-gray-500" />
+                <p className="text-center text-gray-600 text-lg font-medium">
+                  عربة التسوق فارغة
+                </p>
+                <p className="text-center text-gray-500 text-sm">
+                  . يبدو أنك لم تقم بإضافة أي منتجات حتى الآن
+                </p>
+              </>
             )}
           </CardContent>
           {!isLoading && !error && cartItems.length > 0 && (

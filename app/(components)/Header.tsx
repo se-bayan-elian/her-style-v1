@@ -103,7 +103,7 @@ export default function Header() {
           >
             ✕
           </button>
-          <span className="mr-auto text-nowrap">
+          <span className="mr-auto text-nowrap text-sm  ">
             تخفيضات موسمية تصل إلى 30% لمدة 30 يوم
           </span>
         </div>
@@ -209,9 +209,9 @@ export default function Header() {
       </header>
       {/* Navigation */}
       <nav className="w-full   bg-purple text-white text-xs lg:text-base text-center  py-0 lg:py-4">
-        <div className="mx-auto flex items-center w-[95%] md:w-[90%] lg:w-[80%]">
+        <div className="mx-auto flex justify-between items-center w-[95%] md:w-[90%] lg:w-[80%]">
           <Login />
-          <div className="hidden lg:flex ml-auto  justify-center space-x-6 ">
+          <div className="hidden lg:flex    justify-center space-x-6 ">
             <Link href="/about">من نحن</Link>
             <Link href="/service">سياسة الاستخدام</Link>
             <Link href="/shop">جميع المنتجات</Link>
