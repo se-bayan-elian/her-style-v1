@@ -179,7 +179,7 @@ export default function ProductPage({
           </div>
           <div className="bg-gray-100 p-4 rounded-lg mb-6 w-full lg:hidden ">
             <h3 className="font-semibold mb-2 text-right">تفاصيل المنتج</h3>
-            <p dir="rtl" className="text-justify text-gray-700 ">
+            <p dir="rtl" className="text-justify text-gray-700 whitespace-pre-wrap">
               {data.description}
             </p>
           </div>
