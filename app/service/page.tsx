@@ -2,8 +2,8 @@ import React from "react";
 
 function page() {
   return (
-    <section dir="rtl" className="text-right flex justify-center items-center ">
-      <div className="bg-white shadow-lg rounded-lg mx-auto  w-[95%] md:w-[90%] lg:w-[80%] pm-5 pt-4">
+    <section dir="rtl" className="text-right">
+      <div className="bg-white shadow-lg rounded-lg mx-auto  w-[95%] md:w-[90%] lg:w-[80%] my-10 p-6">
         <h1 className="text-2xl font-bold mb-4">سياسة استخدام موقعنا</h1>
         <p className="mb-4">
           مرحبًا بكم في "HAWAAK"، ونتمنى لكم تجربة تسوق ممتعة وآمنة. من خلال استخدام موقعنا، فإنك تقبل الشروط والأحكام التالية. يرجى قراءة هذه السياسة بعناية:
