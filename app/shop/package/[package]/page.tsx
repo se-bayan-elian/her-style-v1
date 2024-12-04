@@ -129,15 +129,19 @@ export default function PackagePage({
           مشاركة
           <Share2 />
         </Button>
-        <p className="text-gray-600 ml-auto md:ml-0  md:mb-0 md:text-base text-base text-right">
+        <p
+          dir="rtl"
+          className="text-gray-600 ml-auto md:ml-0  md:mb-0 md:text-base text-base text-right flex gap-1"
+        >
           <Link className="text-black" href="/">
             الرئيسية
           </Link>{" "}
-          /{" "}
+          <span>/</span>
           <Link href="/shop" className="text-black">
             المتجر
           </Link>{" "}
-          / {Package.name}
+          <span>/</span>
+          <span>{Package.name}</span>
         </p>
       </div>
       <div className="h-fit flex flex-col-reverse lg:flex-row gap-8">
@@ -194,7 +198,10 @@ export default function PackagePage({
           </div>
           <div className=" bg-gray-100 p-4 rounded-lg mb-6 w-full lg:hidden">
             <h3 className="font-semibold mb-2 text-right">تفاصيل المجموعة</h3>
-            <p dir="rtl" className="text-justify text-gray-700 whitespace-pre-wrap">
+            <p
+              dir="rtl"
+              className="text-justify text-gray-700 whitespace-pre-wrap"
+            >
               {Package.description}
             </p>
           </div>
@@ -212,7 +219,10 @@ export default function PackagePage({
           {Package.availableQuantity > 0 ? (
             <button
               onClick={() => handleAddToCart(Package._id)}
-              className="flex items-center justify-center w-full bg-purple text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-300"
+              disabled={mutation.isPending}
+              className={`flex items-center justify-center w-full  text-white px-6 py-3 rounded-lg ${
+                mutation.isPending ? "bg-purple-400" : "bg-purple"
+              } hover:bg-purple-600 transition duration-300`}
             >
               <span className="ml-2">
                 {mutation.isPending ? "... جاري الإضافة" : "إضافة للسلة"}

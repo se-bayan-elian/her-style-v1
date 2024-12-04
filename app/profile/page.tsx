@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SquarePenIcon, User } from "lucide-react";
-import { deleteCookie } from "cookies-next";
+import { deleteCookie, getCookie } from "cookies-next";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -16,6 +16,9 @@ import { useDispatch } from "react-redux";
 import { addName, deleteName } from "@/utils/cart";
 import Orders from "./Orders";
 import Loading from "../(components)/Loading";
+import Error from "next/error";
+import { useForm } from "react-hook-form";
+import { toast } from "@/hooks/use-toast";
 
 export interface Profile {
   _id: string;
@@ -64,8 +67,20 @@ export default function ProfilePage() {
     mutationFn: updateProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client-profile"] });
+      toast({
+        title: "نجاح",
+        description: "تم تعديل بياناتك بنجاح",
+        variant: "default",
+      });
     },
-    onError: () => {},
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ["client-profile"] });
+      toast({
+        title: "فشل",
+        description: "حدث خطأ أثناء تعديل بياناتك",
+        variant: "destructive",
+      });
+    },
   });
 
   const handleSignOut = () => {
@@ -74,30 +89,42 @@ export default function ProfilePage() {
     deleteCookie("auth_token");
     dispatch(deleteName());
     queryClient.invalidateQueries({ queryKey: ["cart"] });
-    router.push("/");
-    setTimeout(() => {
-      location.reload();
-    }, 1000);
+    location.reload();
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const name = formData.get("name") as string;
-    const phoneNumber = formData.get("phoneNumber") as string;
-    updateProfileMutation.mutate({ name, phoneNumber });
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ name: string; phoneNumber: string }>({
+    defaultValues: {
+      name: profile?.name || "",
+      phoneNumber: profile?.phoneNumber || "",
+    },
+  });
+
+  const onSubmit = (data: { name: string; phoneNumber: string }) => {
+    updateProfileMutation.mutate(data);
   };
 
+  useEffect(() => {
+    if (!getCookie("auth_token")) {
+      router.push("/");
+    }
+  }, [getCookie("auth_token")]);
+  useEffect(() => {
+    if (profile?.name) {
+      setValue("name", profile?.name);
+      setValue("phoneNumber", profile?.phoneNumber);
+    }
+  }, [profile]);
   if (isProfileLoading) {
     return <Loading />;
   }
 
   if (isProfileError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>حدث خطأ أثناء تحميل الملف الشخصي. يرجى المحاولة مرة أخرى.</p>
-      </div>
-    );
+    return Error;
   }
 
   return (
@@ -122,7 +149,7 @@ export default function ProfilePage() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
-          <div className="flex  items-center justify-end mb-6">
+          <div className="flex items-center justify-end mb-6">
             <div className="mr-4 text-right">
               <h1 className="text-2xl font-bold">مرحبا بك، {profile?.name}</h1>
               <p className="text-gray-600">الرئيسة / تعديل المعلومات</p>
@@ -133,14 +160,13 @@ export default function ProfilePage() {
             />
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex justify-between items-center border-2 rounded-lg border-gray-200 px-2">
               <div className="flex items-center gap-2">
                 <SquarePenIcon />
                 <Input
-                  name="name"
+                  {...register("name", { required: "الاسم مطلوب" })}
                   type="text"
-                  defaultValue={profile?.name}
                   className="p-2 rounded focus:outline-none"
                 />
               </div>
@@ -148,20 +174,37 @@ export default function ProfilePage() {
                 الاسم
               </Label>
             </div>
+            {errors.name && (
+              <p className="text-red-500 text-sm !mt-0 text-right">
+                {errors.name.message}
+              </p>
+            )}
+
             <div className="flex justify-between items-center border-2 rounded-lg border-gray-200 px-2">
               <div className="flex items-center gap-2">
                 <SquarePenIcon />
                 <Input
-                  name="phoneNumber"
+                  {...register("phoneNumber", {
+                    required: "رقم الهاتف مطلوب",
+                    pattern: {
+                      value: /^0\d{9}$/,
+                      message: "تنسق خاطئ : مثال 0552222222",
+                    },
+                  })}
                   type="tel"
-                  defaultValue={profile?.phoneNumber}
                   className="p-2 rounded focus:outline-none"
                 />
               </div>
-              <Label className="font-medium text-right text-nowrap">
+              <Label className="font-medium text-right text-nowrap ">
                 رقم الهاتف
               </Label>
             </div>
+            {errors.phoneNumber && (
+              <p className="text-red-500 text-sm !mt-0 text-right">
+                {errors.phoneNumber.message}
+              </p>
+            )}
+
             <div className="flex justify-between items-center border-2 rounded-lg border-gray-200 px-2">
               <div className="flex items-center gap-2">
                 <Input
@@ -177,11 +220,11 @@ export default function ProfilePage() {
             </div>
             <Button
               type="submit"
-              className="w-full bg-purple text-white"
-              disabled={updateProfileMutation.isLoading}
+              className={`w-full bg-purple text-white`}
+              disabled={updateProfileMutation.isPending}
             >
-              {updateProfileMutation.isLoading
-                ? "جاري الحفظ..."
+              {updateProfileMutation.isPending
+                ? "... جاري الحفظ"
                 : "حفظ التعديلات"}
             </Button>
             <Button

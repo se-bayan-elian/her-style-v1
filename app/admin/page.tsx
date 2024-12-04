@@ -25,17 +25,14 @@ export default function AdminDashboard() {
     deleteCookie("auth_token");
     dispatch(deleteName());
     queryClient.invalidateQueries({ queryKey: ["cart"] });
-    router.push("/");
-    setTimeout(() => {
-      location.reload();
-    }, 1000);
+    location.href = "/";
   };
 
   return (
     <div className="min-h-screen bg-gray-100 text-right" dir="rtl">
-      <div className="container mx-auto md:p-6 py-6 px-1">
+      <div className="container mx-auto w-[95%] md:w-[90%] lg:w-[80%]  py-6 ">
         <div className="flex justify-between items-center mb-8  flex-col md:flex-row">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0 text-right md:text-center">
             لوحة التحكم الإدارية
           </h1>
           <Button

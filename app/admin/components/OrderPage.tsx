@@ -23,10 +23,15 @@ import Pagination from "@/app/(components)/Pagination";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import { Order } from "@/app/profile/Orders";
+import { useForm } from "react-hook-form";
+import Alert from "../../(components)/Alert";
+import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 
 function OrderPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -39,6 +44,18 @@ function OrderPage() {
   const updateOrderStatus = useMutation({
     mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
       axiosInstance.put(`orders/${orderId}`, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+  const updateOrderPaymentStatus = useMutation({
+    mutationFn: ({
+      orderId,
+      paymentStatus,
+    }: {
+      orderId: string;
+      paymentStatus: string;
+    }) => axiosInstance.put(`orders/${orderId}`, { paymentStatus }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     },
@@ -81,13 +98,25 @@ function OrderPage() {
         return status;
     }
   };
+  const getPaymentMethodText = (status: string) => {
+    switch (status) {
+      case "COD":
+        return "عند الاستلام";
+      case "BANKAK":
+        return "تطبيق بنكك";
+      case "INSTANT":
+        return "دفع فوري";
+      default:
+        return status;
+    }
+  };
   const getPaymentStatusColor = (status: string) => {
     switch (status) {
       case "PENDING":
         return "bg-orange-200 text-orange-800";
       case "SUCCESS":
         return "bg-green-200 text-green-800";
-      case "CANCELLED":
+      case "REFUNDED":
         return "bg-red-200 text-red-800";
       default:
         return "bg-gray-200 text-gray-800";
@@ -97,10 +126,12 @@ function OrderPage() {
     switch (status) {
       case "PENDING":
         return "قيد المراجعة";
+      case "NOT_PAID":
+        return "قيد المراجعة";
       case "SUCCESS":
         return "تم الدفع";
-      case "CANCELLED":
-        return "ملغي";
+      case "REFUNDED":
+        return "مرجع";
       default:
         return status;
     }
@@ -108,6 +139,39 @@ function OrderPage() {
 
   const handleStatusUpdate = (orderId: string, newStatus: string) => {
     updateOrderStatus.mutate({ orderId, status: newStatus });
+  };
+  const handlePaymentStatusUpdate = (orderId: string, newStatus: string) => {
+    updateOrderPaymentStatus.mutate({ orderId, paymentStatus: newStatus });
+  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ email: string }>();
+
+  const sendOrderMutation = useMutation({
+    mutationFn: (data: { orderId: string; email: string }) =>
+      axiosInstance.post("/send-order", data),
+    onSuccess: () => {
+      setIsEmailDialogOpen(false);
+      toast({
+        title: "نجاح",
+        description: "تم إرسال الطلب بنجاح إلى العميل عبر البريد الإلكتروني.",
+        // يمكنك إضافة المزيد من الخصائص هنا إذا لزم الأمر
+      });
+    },
+  });
+  const handleEmailSubmit = (data: { email: string }) => {
+    if (selectedOrder) {
+      sendOrderMutation.mutate({
+        orderId: selectedOrder._id,
+        email: data.email,
+      });
+    }
+  };
+  const handleSendDeliveryClick = (order: any) => {
+    setIsEmailDialogOpen(true);
+    setSelectedOrder(order);
   };
 
   return (
@@ -150,7 +214,7 @@ function OrderPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredOrders.map((order: any) => (
+                orders.map((order: any) => (
                   <TableRow key={order._id}>
                     <TableCell>
                       <button
@@ -193,6 +257,35 @@ function OrderPage() {
                               size="sm"
                               variant="outline"
                               className="bg-purple text-white"
+                              onClick={() => handleSendDeliveryClick(order)}
+                              disabled={updateOrderStatus.isPending}
+                            >
+                              إرسال التوصيل
+                            </Button>
+                            {order.paymentMethod === "BANKAK" &&
+                              order.paymentStatus === "PENDING" && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="bg-green-700 text-white hover:bg-green-600 hover:text-white"
+                                  onClick={() =>
+                                    handlePaymentStatusUpdate(
+                                      order._id,
+                                      "SUCCESS"
+                                    )
+                                  }
+                                  disabled={
+                                    updateOrderPaymentStatus.isPending ||
+                                    updateOrderStatus.isPending
+                                  }
+                                >
+                                  تأكيد الدفع
+                                </Button>
+                              )}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="bg-green-700 text-white hover:bg-green-600 hover:text-white"
                               onClick={() =>
                                 handleStatusUpdate(order._id, "DELIVERED")
                               }
@@ -255,6 +348,7 @@ function OrderPage() {
                     <strong>العنوان</strong> <br />{" "}
                     <Link
                       href={selectedOrder.address.googleLocation}
+                      target="_blank"
                     >{`${selectedOrder?.address.street}, ${selectedOrder.address.postalCode}, ${selectedOrder?.address.city}`}</Link>
                   </div>
                   <div className="text-right">
@@ -270,11 +364,20 @@ function OrderPage() {
                   <div className="text-right">
                     <strong>طريقة الدفع</strong>
                     <br />{" "}
-                    {selectedOrder?.paymentMethod === "COD"
-                      ? "عند الاستلام"
-                      : "دفع إلكتروني"}
+                    {getPaymentMethodText(selectedOrder?.paymentMethod || "")}
                   </div>
                 </div>
+                {selectedOrder?.paymentId && (
+                  <div
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    dir="rtl"
+                  >
+                    <div className="text-right">
+                      <strong>معرف الدفع</strong> <br />{" "}
+                      {selectedOrder?.paymentId || "لا يوجد"}
+                    </div>
+                  </div>
+                )}
                 <div className="col-span-1">
                   <h3 className="text-lg font-semibold mb-2 text-right">
                     تفاصيل السلة
@@ -314,56 +417,54 @@ function OrderPage() {
           )}
         </DialogContent>
       </Dialog>
+      {/* Email Dialog */}
+      <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
+        <DialogContent dir="rtl">
+          <DialogHeader>
+            <DialogTitle dir="rtl" className="text-right">
+              إرسال التوصيل
+            </DialogTitle>
+          </DialogHeader>
+          {sendOrderMutation.isError && (
+            <Alert type="error" message={"لم يتم إرسال الطلب"} />
+          )}
+
+          <form
+            onSubmit={handleSubmit(handleEmailSubmit)}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-md font-medium">
+                البريد الإلكتروني
+              </label>
+              <Input
+                type="email"
+                placeholder="ادخل ايميل البائع"
+                className="w-full border rounded-md px-4 py-2"
+                {...register("email", {
+                  required: "الإيميل مطلوب",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "البريد الإلكتروني غير صالح",
+                  },
+                })}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email.message}</p>
+              )}
+            </div>
+            <Button
+              type="submit"
+              disabled={sendOrderMutation.isPending}
+              className="mr-auto block mt-0 bg-purple"
+            >
+              {sendOrderMutation.isPending ? "جاري الإرسال" : "إرسال"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
-
-// function CartInfo({ order }: { order: any }) {
-//   return (
-//     <div className="space-y-4 text-right">
-//       <div>
-//         <h3 className="font-semibold">معلومات المشتري</h3>
-//         <p>{order.user.name} :الاسم</p>
-//         <p> {order.user.phoneNumber} :رقم الهاتف</p>
-//       </div>
-//       <div>
-//         <h3 className="font-semibold">عنوان التوصيل</h3>
-//         <p> {order.address.street} :الشارع</p>
-//         <p>المدينة: {order.address.city}</p>
-//         <p> {order.address.postalCode} :الرمز البريدي</p>
-//         <p> {order.address.country}:الدولة</p>
-//       </div>
-//       <div>
-//         <h3 className="font-semibold">المنتجات</h3>
-//         <ul className="">
-//           {order.cart.products.map((product: any) => (
-//             <li key={product._id}>
-//               {product.productId.name} - الكمية: {product.quantity} - السعر:{" "}
-//               {product.totalPrice} ريال
-//             </li>
-//           ))}
-//         </ul>
-//       </div>
-//       <div>
-//         <h3 className="font-semibold">
-//           إجمالي الطلب: {order.cart.totalPrice} ريال
-//         </h3>
-//       </div>
-//       <div>
-//         <h3 className="font-semibold">معلومات الدفع</h3>
-//         <p>
-//           طريقة الدفع :{" "}
-//           {order.paymentMethod === "COD"
-//             ? "الدفع عند الاستلام"
-//             : "دفع إلكتروني"}
-//         </p>
-//         <p>
-//           حالة الدفع:{" "}
-//           {order.paymentStatus === "PENDING" ? "قيد الانتظار" : "مكتمل"}
-//         </p>
-//       </div>
-//     </div>
-//   );
-// }
 
 export default OrderPage;

@@ -1,36 +1,55 @@
-import React from 'react'
-import { User } from "lucide-react";
+import React from "react";
+import { Star } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination } from "swiper/modules";
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/pagination';
-import axiosInstance from '@/utils/axiosInstance';
-import { useQuery } from '@tanstack/react-query';
+import "swiper/css";
+import "swiper/css/pagination";
+import axiosInstance from "@/utils/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
+import { Autoplay, Pagination } from "swiper/modules";
 
 async function getTestmonials() {
-  const response = await axiosInstance.get('/comments');
+  const response = await axiosInstance.get("/comments");
   return response.data;
 }
 
 function Testmonial() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["testmonials"],
+    queryFn: getTestmonials,
+  });
 
-    const {data , isLoading , error} =  useQuery({
-        queryKey: ['testmonials'],
-        queryFn: getTestmonials,
-    })
+  // Skeleton Loader
+  if (isLoading) {
+    return (
+      <div className="w-full py-5 mb-5">
+        <div className="w-full p-4 h-[230px] bg-gray-200 animate-pulse rounded-lg shadow-md">
+          <div className="flex flex-col justify-center items-center h-full space-y-4">
+            <div className="w-16 h-16 rounded-full bg-gray-300"></div>
+            <div className="w-20 h-4 bg-gray-300 rounded"></div>
+            <div className="w-48 h-6 bg-gray-300 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-    if(isLoading) return <div>Loading...</div>
-
-    if(error) return <div>Error: {error.message}</div>
-
+  // Error handling
+  if (error)
+    return (
+      <div className="text-center text-red-600">Error: {error.message}</div>
+    );
 
   return (
     <Swiper
       slidesPerView={1} // Default for mobile
-      spaceBetween={30}
-      pagination={{
-        clickable: true,
+      spaceBetween={20}
+      pagination={{ enabled: false }} // Pagination is disabled by removing this line
+      autoplay={{
+        delay: 1500, // Delay in ms for auto sliding
+        disableOnInteraction: false, // Keeps autoplay running after interaction
+        reverseDirection: true,
+        pauseOnMouseEnter: true,
       }}
       breakpoints={{
         640: {
@@ -40,23 +59,46 @@ function Testmonial() {
           slidesPerView: 3,
         },
       }}
-      modules={[Pagination]}
-      className="mySwiper w-full h-auto"
+      modules={[Autoplay, Pagination]} // Use correct modules
+      className="mySwiper w-full py-5 mb-5"
     >
-    {data && data.data.comments.slice(0,5).map((comment:any , index:number) => (
-      <SwiperSlide key={index}>
-        <div className="bg-white p-4 rounded-lg shadow text-center h-full flex flex-col justify-center items-center">
-          <User
-            className="mx-auto mb-4 text-purple border-2 border-purple rounded-full p-2"
-            size={64}
-          />
-          <h3 className="font-bold">{comment.userId?.name}</h3>
-          <p className="mb-2">{comment.content}</p>
-        </div>
-      </SwiperSlide>
-    ))}
-  </Swiper>
-  )
+      {data &&
+        data.data.comments.slice(0, 5).map((comment: any, index: number) => (
+          <SwiperSlide
+            key={index}
+            className="shadow-lg rounded-lg bg-white p-6 flex flex-col justify-between items-center space-y-4 !h-[240px]"
+          >
+            <div className="flex flex-col justify-center items-center space-y-4">
+              <Image
+                className="mx-auto rounded-full"
+                width={70}
+                height={70}
+                alt="user_avatar"
+                src={"/avatar-purple.png"}
+              />
+              <div className="flex gap-1 justify-center items-center mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-5 h-5 ${
+                      i < comment.stars
+                        ? "text-yellow-400 fill-current"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800">
+                {comment.userId?.name}
+              </h3>
+              <p className="text-sm text-gray-600 text-ellipsis line-clamp-2 text-center">
+                {comment.content}
+              </p>
+            </div>
+          </SwiperSlide>
+        ))}
+    </Swiper>
+  );
 }
 
-export default Testmonial
+export default Testmonial;

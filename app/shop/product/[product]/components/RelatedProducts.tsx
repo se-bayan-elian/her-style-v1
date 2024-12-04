@@ -43,7 +43,7 @@ function RelatedProducts({ data }: { data: any }) {
       {data.map((item: any, index: number) => (
         <div
           key={index}
-          className="bg-white rounded-lg overflow-hidden shadow-md md:p-4 flex md:gap-2 flex-col sm:flex-row-reverse items-start md:items-center"
+          className="bg-white rounded-lg overflow-hidden shadow-md md:pl-4  flex md:gap-2 flex-col sm:flex-row-reverse items-start md:items-center"
         >
           <div className="relative  w-full sm:w-1/2  md:w-1/3  h-[230px] md:h-[270px] ">
             <Link href={`/shop/product/${item._id}`}>
@@ -52,7 +52,7 @@ function RelatedProducts({ data }: { data: any }) {
                 alt={`Related product ${index}`}
                 layout="fill"
                 objectFit="cover"
-                className="md:rounded-lg w-full"
+                className=" w-full"
               />
             </Link>
           </div>
@@ -73,7 +73,7 @@ function RelatedProducts({ data }: { data: any }) {
                 </Link>
               </div>
             </div>
-            <div className="flex justify-between md:justify-end items-center">
+            <div className="flex justify-between md:justify-end items-center mb-2">
               <span
                 dir="rtl"
                 className="text-base md:hidden  flex font-bold text-purple  justify-center items-center gap-1"
@@ -95,11 +95,18 @@ function RelatedProducts({ data }: { data: any }) {
               </div>
             </div>
 
-            <p className="text-justify text-sm text-gray-600 mb-4 whitespace-pre-wrap" dir="rtl">
-              {item.description.length > 300
-                ? `${item.description.slice(0, 300)}...`
-                : item.description}
+            <p
+              className="text-justify text-sm text-gray-600 mb-2 whitespace-pre-wrap overflow-hidden text-ellipsis"
+              style={{
+                display: "-webkit-box",
+                WebkitLineClamp: 4, // Adjust this based on the number of lines
+                WebkitBoxOrient: "vertical",
+              }}
+              dir="rtl"
+            >
+              {item.description}{" "}
             </p>
+
             <div className="flex justify-end items-center">
               <button
                 onClick={() => handleAddToCart(item._id)}

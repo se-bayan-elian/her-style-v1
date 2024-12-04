@@ -208,7 +208,7 @@ export default function Header() {
         </Link>
       </header>
       {/* Navigation */}
-      <nav className="w-full   bg-purple text-white text-xs lg:text-base text-center  py-0 lg:py-4">
+      <nav className="w-full   bg-purple text-white text-xs lg:text-base text-center  py-0 lg:py-3">
         <div className="mx-auto flex justify-between items-center w-[95%] md:w-[90%] lg:w-[80%]">
           <Login />
           <div className="hidden lg:flex    justify-center space-x-6 ">

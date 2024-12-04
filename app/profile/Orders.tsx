@@ -59,6 +59,7 @@ export interface Order {
   paymentMethod: string;
   paymentStatus: string;
   createdAt: string;
+  paymentId?: string;
 }
 
 const fetchOrders = async () => {
@@ -86,7 +87,7 @@ const getPaymentStatusColor = (status: string) => {
       return "bg-orange-200 text-orange-800";
     case "SUCCESS":
       return "bg-green-200 text-green-800";
-    case "CANCELLED":
+    case "REFUNDED":
       return "bg-red-200 text-red-800";
     default:
       return "bg-gray-200 text-gray-800";
@@ -111,12 +112,12 @@ const getPaymentStatusText = (status: string) => {
       return "قيد المراجعة";
 
     case "NOT_PAID":
-      return "قيد المراجعة";
+      return "لم يتم الدفع";
 
     case "SUCCESS":
       return "تم الدفع";
-    case "CANCELLED":
-      return "ملغي";
+    case "REFUNDED":
+      return "مرجع";
     default:
       return status;
   }

@@ -65,6 +65,7 @@ function VerifyPage() {
       toast({
         title: "فشل",
         description: "حدث خطأ غير متوقع ، قم بإعادة المحاولة بعد 5 دقائق",
+        variant: "destructive",
       });
     },
   });

@@ -27,6 +27,7 @@ import { Cloudinary, Transformation } from "@cloudinary/url-gen";
 import "swiper/css";
 import "swiper/css/pagination";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 const addToCartMutation = async (productId: string) => {
   const response = await axiosInstance.post(`cart/add-product/${productId}`, {
@@ -64,7 +65,11 @@ export default function ProductPage({
     mutation.mutate(id);
   };
 
-  const { data: productData, isLoading } = useQuery({
+  const {
+    data: productData,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["view-product"],
     queryFn: async () => {
       const res = await axiosInstance.get(`/products/${params.product}`);
@@ -73,6 +78,7 @@ export default function ProductPage({
   });
 
   if (isLoading) return <SingleProductSkeleton />;
+  if (isError) return notFound();
 
   const data = productData.data.product;
 
@@ -117,15 +123,19 @@ export default function ProductPage({
           مشاركة
           <Share2 />
         </Button>
-        <p className="text-gray-600 ml-auto md:ml-0  md:mb-0 md:text-base text-base text-right">
+        <p
+          dir="rtl"
+          className="text-gray-600 ml-auto md:ml-0  md:mb-0 md:text-base text-base text-right flex gap-1"
+        >
           <Link className="text-black" href="/">
             الرئيسية
           </Link>{" "}
-          /{" "}
+          <span>/</span>
           <Link href="/shop" className="text-black">
             المتجر
           </Link>{" "}
-          / {data.name}
+          <span>/</span>
+          <span>{data.name}</span>
         </p>
       </div>
       <div className="h-fit flex flex-col-reverse lg:flex-row gap-8">
@@ -179,14 +189,20 @@ export default function ProductPage({
           </div>
           <div className="bg-gray-100 p-4 rounded-lg mb-6 w-full lg:hidden ">
             <h3 className="font-semibold mb-2 text-right">تفاصيل المنتج</h3>
-            <p dir="rtl" className="text-justify text-gray-700 whitespace-pre-wrap">
+            <p
+              dir="rtl"
+              className="text-justify text-gray-700 whitespace-pre-wrap"
+            >
               {data.description}
             </p>
           </div>
           {data.availableQuantity ? (
             <button
               onClick={() => handleAddToCart(data._id)}
-              className="flex items-center justify-center w-full bg-purple text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition duration-300"
+              disabled={mutation.isPending}
+              className={`flex items-center justify-center w-full  text-white px-6 py-3 rounded-lg ${
+                mutation.isPending ? "bg-purple-400" : "bg-purple"
+              } hover:bg-purple-600 transition duration-300`}
             >
               <span className="ml-2">
                 {mutation.isPending ? "... جاري الإضافة" : "إضافة للسلة"}
