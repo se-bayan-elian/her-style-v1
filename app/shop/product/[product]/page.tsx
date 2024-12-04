@@ -129,11 +129,11 @@ export default function ProductPage({
         >
           <Link className="text-black" href="/">
             الرئيسية
-          </Link>{" "}
+          </Link>
           <span>/</span>
           <Link href="/shop" className="text-black">
             المتجر
-          </Link>{" "}
+          </Link>
           <span>/</span>
           <span>{data.name}</span>
         </p>
