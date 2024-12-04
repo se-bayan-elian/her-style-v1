@@ -127,7 +127,7 @@ function OrderPage() {
       case "PENDING":
         return "قيد المراجعة";
       case "NOT_PAID":
-        return "قيد المراجعة";
+        return "لم يتم الدفع";
       case "SUCCESS":
         return "تم الدفع";
       case "REFUNDED":
@@ -151,7 +151,7 @@ function OrderPage() {
 
   const sendOrderMutation = useMutation({
     mutationFn: (data: { orderId: string; email: string }) =>
-      axiosInstance.post("/send-order", data),
+      axiosInstance.post("/orders/send-order", data),
     onSuccess: () => {
       setIsEmailDialogOpen(false);
       toast({
