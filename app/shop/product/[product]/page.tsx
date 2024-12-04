@@ -115,7 +115,7 @@ export default function ProductPage({
 
   return (
     <div className="container mx-auto  w-[95%] md:w-[90%] lg:w-[80%] pm-5 pt-4">
-      <div className="flex flex-col-reverse gap-3 md:gap-0 md:flex-row items-center justify-between mb-4">
+      <div className="flex flex-col-reverse gap-3 md:gap-0 md:flex-row md:items-center justify-between mb-4">
         <Button
           onClick={handleShare}
           className="text-purple mr-auto md:mr-0 bg-white flex items-center gap-1 border border-purple hover:bg-purple-100"
