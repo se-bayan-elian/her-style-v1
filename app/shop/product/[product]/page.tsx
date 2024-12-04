@@ -125,7 +125,7 @@ export default function ProductPage({
         </Button>
         <p
           dir="rtl"
-          className="text-gray-600 ml-auto md:ml-0  md:mb-0 md:text-base text-base text-right flex gap-1"
+          className="text-gray-600 flex-end   md:mb-0 md:text-base text-base text-right flex gap-1"
         >
           <Link className="text-black" href="/">
             الرئيسية
