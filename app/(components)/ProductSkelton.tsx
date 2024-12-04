@@ -13,7 +13,7 @@ const Product: React.FC<ProductProps> = ({ isLoading = false }) => {
       <div className="bg-white w-full rounded-lg shadow-md p-4">
         <Skeleton className="h-[250px] w-full rounded-t-lg mb-4" />
         <Skeleton className="h-6 w-3/4 mb-2 ml-auto" />
-        <div className="flex items-center justify-end mb-2">
+        <div className="flex items-center justify-start mb-2">
           <Skeleton className="h-4 w-8 mr-1" />
           <div className="flex justify-start">
             {[...Array(5)].map((_, i) => (
@@ -21,7 +21,7 @@ const Product: React.FC<ProductProps> = ({ isLoading = false }) => {
             ))}
           </div>
         </div>
-        <div className="flex flex-col-reverse items-end">
+        <div className="flex flex-col-reverse items-start">
           <Skeleton className="h-10 w-32 mt-3" />
           <div className="text-right">
             <Skeleton className="h-6 w-20 mb-1" />
