@@ -39,17 +39,18 @@ function OrderPage() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["orders", page, limit],
-    queryFn: () => axiosInstance.get(`orders`,{
-      params: { page, limit },
+    queryFn: async() => {
+     const response = await axiosInstance.get(`/orders`,{
+      params: { page, limit }
+      };
+      setCount(response?.data?.data?.options?.count || 0);
+       return response;
     }),
   });
 
   const updateOrderStatus = useMutation({
-    mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>{
-      axiosInstance.put(`orders/${orderId}`, { status });
-      setCount(response?.data?.data?.options.count);
-
-    },
+    mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>axiosInstance.put(`orders/${orderId}`, { status })
+      ,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders",page,limit] });
     },
