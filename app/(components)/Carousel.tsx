@@ -19,7 +19,7 @@ const fetchSliderData = async () => {
 };
 
 function Carousel() {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, isError,error } = useQuery({
     queryKey: ["sliders"],
     queryFn: fetchSliderData,
   });
@@ -44,7 +44,7 @@ function Carousel() {
     );
   }
 
-  if (error) {
+  if (isError) {
     throw error;
   }
 
