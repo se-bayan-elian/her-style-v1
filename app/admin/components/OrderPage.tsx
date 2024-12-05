@@ -42,7 +42,7 @@ function OrderPage() {
     queryFn: async() => {
      const response = await axiosInstance.get(`/orders`,{
       params: { page, limit }
-      };
+      });
       setCount(response?.data?.data?.options?.count || 0);
        return response;
     }),
