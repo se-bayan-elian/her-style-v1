@@ -171,7 +171,7 @@ function Productpage() {
         description: "تم إضافة المنتج بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products",page,limit] });
       resetForm();
     },
     onError: () => {
@@ -193,7 +193,7 @@ function Productpage() {
         description: "تم تحديث المنتج بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products",page,limit] });
       resetForm();
       setIsEditing(false);
     },
@@ -216,7 +216,7 @@ function Productpage() {
         description: "تم حذف المنتج بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products",page,limit] });
     },
     onError: () => {
       toast({

@@ -35,17 +35,23 @@ function OrderPage() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [count, setCount] = useState(0);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["orders", page, limit],
-    queryFn: () => axiosInstance.get(`orders`),
+    queryFn: () => axiosInstance.get(`orders`,{
+      params: { page, limit },
+    }),
   });
 
   const updateOrderStatus = useMutation({
-    mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>
-      axiosInstance.put(`orders/${orderId}`, { status }),
+    mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>{
+      axiosInstance.put(`orders/${orderId}`, { status });
+      setCount(response?.data?.data?.options.count);
+
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders",page,limit] });
     },
   });
   const updateOrderPaymentStatus = useMutation({
@@ -57,12 +63,11 @@ function OrderPage() {
       paymentStatus: string;
     }) => axiosInstance.put(`orders/${orderId}`, { paymentStatus }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders",page,limit] });
     },
   });
 
   const orders = data?.data?.data?.orders || [];
-  const { count } = data?.data?.data?.options || {};
 
   const filteredOrders = orders.filter(
     (order: any) => order.status !== "CANCELLED"
@@ -312,7 +317,8 @@ function OrderPage() {
               )}
             </TableBody>
           </Table>
-          <Pagination
+          
+      <Pagination
             currentPage={page}
             totalCount={count}
             limit={limit}

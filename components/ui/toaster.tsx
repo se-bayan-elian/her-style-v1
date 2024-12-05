@@ -23,7 +23,7 @@ export function Toaster() {
             {...props}
           >
             <div className="grid gap-1 ">
-              {title && <ToastTitle>{title}</ToastTitle>}
+              {title && <ToastTitle {...props}>{title}</ToastTitle>}
               {description && (
                 <ToastDescription>{description}</ToastDescription>
               )}

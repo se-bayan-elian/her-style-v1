@@ -6,8 +6,48 @@ import "swiper/css/pagination";
 import { Autoplay, Pagination } from "swiper/modules";
 import Image from "next/image";
 import Link from "next/link";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
+import axiosInstance from "@/utils/axiosInstance";
+
+// Fetch slider data from API
+const fetchSliderData = async () => {
+  const response = await axiosInstance.get("/sliders");
+  return response.data.data;
+};
 
 function Carousel() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["sliders"],
+    queryFn: fetchSliderData,
+  });
+  const router = useRouter();
+
+  // Handle different integration types and routing
+  const handleLinkClick = (link: string, type: string) => {
+    if (type === "URL") {
+      window.open(link, "_blank");
+    } else if (type === "PACKAGE") {
+      router.push(`/shop/package/${link}`);
+    } else if (type === "PRODUCT") {
+      router.push(`/shop/product/${link}`);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="mb-2">
+        <Skeleton className="lg:h-[400px] h-[25vh] w-full" />
+      </div>
+    );
+  }
+
+  if (error) {
+    throw error;
+  }
+
   return (
     <div className="mb-2">
       <Swiper
@@ -18,67 +58,29 @@ function Carousel() {
           disableOnInteraction: false,
         }}
         pagination={{
-          clickable: true,
+          enabled: false,
         }}
         modules={[Autoplay, Pagination]}
         className="mySwiper"
       >
-        <SwiperSlide>
-          <Link href="/shop/product/672ba4e09e16953b66fa8629">
-            <Image
-              src="https://res.cloudinary.com/dnugszkww/image/upload/v1732015623/banner4_rlz5j9.jpg"
-              alt="Image Slider"
-              width={1200}
-              height={400}
-              className="w-full rounded-lg lg:h-full h-[25vh] sm:h-60 bg-cover"
-            />
-          </Link>
-        </SwiperSlide>
-        <SwiperSlide>
-        <Link href="/shop/product/6720dbe1bd7078dee3304891">
-          <Image
-            src="https://res.cloudinary.com/dnugszkww/image/upload/v1732015623/banner5_plasay.jpg"
-            alt="Image Slider 2"
-            width={1200}
-            height={400}
-            className="w-full rounded-lg lg:h-full h-[25vh] sm:h-60 bg-cover"
-          />
-          </Link>
-        </SwiperSlide>
-        <SwiperSlide>
-        <Link href="/shop/product/6720d821bd7078dee33047e8">
-            <Image
-              src="https://res.cloudinary.com/dnugszkww/image/upload/v1732015624/banner3_awhypk.jpg"
-              alt="Image Slider 3"
-              width={1200}
-              height={400}
-              className="w-full rounded-lg lg:h-full h-[25vh] sm:h-60 bg-cover"
-            />
-          </Link>
-        </SwiperSlide>
-        <SwiperSlide>
-        <Link href="/shop/product/672ba4e09e16953b66fa8629">
-          <Image
-            src="https://res.cloudinary.com/dnugszkww/image/upload/v1732015628/banner2_lkrtmr.jpg"
-            alt="Image Slider 3"
-            width={1200}
-            height={400}
-            
-            className="w-full rounded-lg lg:h-full h-[25vh] sm:h-60  bg-cover"
-          />
-          </Link>
-        </SwiperSlide>
-        <SwiperSlide>
-          <Link href='/shop/product/6720d9e8bd7078dee3304845'>
-          <Image
-            src="https://res.cloudinary.com/dnugszkww/image/upload/v1732015628/banner1_apd8dj.jpg"
-            alt="Image Slider 3"
-            width={1200}
-            height={400}
-            className="w-full rounded-lg lg:h-full h-[25vh] sm:h-60 bg-cover"
-          />
-          </Link>
-        </SwiperSlide>
+        {data?.sliders?.map((slider: any) => (
+          <SwiperSlide key={slider._id}>
+            <div
+              onClick={() =>
+                handleLinkClick(slider.link, slider.integration_type)
+              }
+              className="cursor-pointer"
+            >
+              <Image
+                src={slider.image}
+                alt={slider.name}
+                width={1200}
+                height={400}
+                className="w-full rounded-lg lg:h-full h-[25vh] sm:h-60 bg-cover"
+              />
+            </div>
+          </SwiperSlide>
+        ))}
       </Swiper>
     </div>
   );

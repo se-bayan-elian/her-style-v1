@@ -13,7 +13,7 @@ import CuponPage from "./components/CuponPage";
 import Productpage from "./components/Productpage";
 import PackagePage from "./components/PackagePage";
 import OrderPage from "./components/OrderPage";
-
+import SlidersPage from "./components/SlidersPage";
 export default function AdminDashboard() {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -46,7 +46,7 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="orders" className="space-y-6">
-          <TabsList className="bg-white p-1 rounded-lg shadow-sm">
+          <TabsList className="bg-white p-1 rounded-lg shadow-sm flex-wrap bg-white mb-5 md:mb-0">
             <TabsTrigger value="orders" className="px-4 py-2">
               الطلبات
             </TabsTrigger>
@@ -58,6 +58,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="coupons" className="px-4 py-2">
               الكوبونات
+            </TabsTrigger>
+            <TabsTrigger value="sliders" className="px-4 py-2">
+              البانرات
             </TabsTrigger>
           </TabsList>
 
@@ -75,6 +78,9 @@ export default function AdminDashboard() {
 
           <TabsContent value="coupons">
             <CuponPage />
+          </TabsContent>
+          <TabsContent value="sliders">
+            <SlidersPage />
           </TabsContent>
         </Tabs>
       </div>

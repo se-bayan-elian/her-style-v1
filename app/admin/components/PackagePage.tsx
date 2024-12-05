@@ -84,7 +84,7 @@ function PackagePage() {
         description: "تم إضافة الحزمة بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-packages"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-packages",page,limit] });
       resetForm();
     },
     onError: () => {
@@ -106,7 +106,7 @@ function PackagePage() {
         description: "تم تحديث الحزمة بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-packages"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-packages",page,limit] });
       resetForm();
       setIsEditing(false);
     },
@@ -129,7 +129,7 @@ function PackagePage() {
         description: "تم حذف الحزمة بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-packages"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-packages",page,limit] });
     },
     onError: () => {
       toast({

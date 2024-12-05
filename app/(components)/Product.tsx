@@ -48,7 +48,6 @@ const Product: React.FC<ProductProps> = ({
       toast({
         title: "نجاح",
         description: "تم إضافة المنتج بنجاح إلى السلة",
-        variant: "default",
       });
 
       // Invalidate and refetch cart data
@@ -107,7 +106,7 @@ const Product: React.FC<ProductProps> = ({
             disabled={mutation.isPending}
             className="mt-3 border-2 flex items-center border-purple text-purple px-4 py-2 rounded-lg hover:bg-purple hover:text-white transition duration-300 disabled:opacity-50"
           >
-            <p>{mutation.isPending ? "جاري الإضافة..." : "إضافة للسلة"}</p>
+            <p>{mutation.isPending ? "...جاري الإضافة" : "إضافة للسلة"}</p>
             <ShoppingBag className="ml-2" />
           </button>
           <div className="text-right">

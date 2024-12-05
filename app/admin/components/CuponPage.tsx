@@ -48,8 +48,9 @@ type Coupon = {
   expiryDate: string;
 };
 
-async function getCoupons(page: number, limit: number) {
-  const { data } = await axiosInstance.get("/coupons", {});
+async function getCoupons(page: number, limit: number,setCount:any) {
+  const { data } = await axiosInstance.get("/coupons", {params:{page,limit}});
+  setCount(data?.data?.options.count);
   return data;
 }
 
@@ -86,9 +87,10 @@ export default function CouponPage() {
     data: coupons,
     isLoading,
     isError,
+    error
   } = useQuery({
     queryKey: ["coupons", page, limit],
-    queryFn: () => getCoupons(page, limit),
+    queryFn: () =>  getCoupons(page, limit,setCount),
   });
 
   const addCouponMutation = useMutation({
@@ -99,7 +101,7 @@ export default function CouponPage() {
         description: "تم إضافة الكوبون بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["coupons"] });
+      queryClient.invalidateQueries({ queryKey: ["coupons",page,limit] });
       resetForm();
     },
     onError: () => {
@@ -111,7 +113,6 @@ export default function CouponPage() {
       });
     },
   });
-
   const updateCouponMutation = useMutation({
     mutationFn: updateCoupon,
     onSuccess: () => {
@@ -120,7 +121,7 @@ export default function CouponPage() {
         description: "تم تحديث الكوبون بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["coupons"] });
+      queryClient.invalidateQueries({ queryKey: ["coupons",page,limit] });
       resetForm();
       setIsEditing(false);
     },
@@ -142,7 +143,7 @@ export default function CouponPage() {
         description: "تم حذف الكوبون بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["coupons"] });
+      queryClient.invalidateQueries({ queryKey: ["coupons",page,limit] });
     },
     onError: () => {
       toast({
