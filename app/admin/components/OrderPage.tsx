@@ -45,7 +45,7 @@ function OrderPage() {
       });
       setCount(response?.data?.data?.options?.count || 0);
        return response;
-    }),
+    },
   });
 
   const updateOrderStatus = useMutation({
