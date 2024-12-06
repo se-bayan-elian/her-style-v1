@@ -41,10 +41,12 @@ export default function RootLayout({
   return (
     <html lang="ar">
       <head>
+
         <link
           rel="stylesheet"
           href="https://cdn.moyasar.com/mpf/1.5.2/moyasar.css"
         ></link>
+        <meta name="robots" content="index, follow" />
         <meta property="og:title" content="متجر هواك" />
         <meta property="og:description" content="هي منصة المنتجات والعطور السودانية وهي وجهة مميزة تهدف إلى تسليط الضوء على المنتجات المحلية والعطور التقليدية التي تتميز بها السودان. تبرز هذه المنصة الحرف اليدوية والفنون التقليدية، كما تسعى لدعم الحرفيين المحليين وتمكينهم من الوصول إلى أسواق أوسع ، وتهدف المنصة أيضًا إلى تعزيز الوعي بالثقافة السودانية وتراثها ."
         />
