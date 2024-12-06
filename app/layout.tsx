@@ -48,7 +48,7 @@ export default function RootLayout({
         <meta property="og:title" content="متجر هوانا" />
         <meta property="og:description" content="هي منصة المنتجات والعطور السودانية وهي وجهة مميزة تهدف إلى تسليط الضوء على المنتجات المحلية والعطور التقليدية التي تتميز بها السودان. تبرز هذه المنصة الحرف اليدوية والفنون التقليدية، كما تسعى لدعم الحرفيين المحليين وتمكينهم من الوصول إلى أسواق أوسع ، وتهدف المنصة أيضًا إلى تعزيز الوعي بالثقافة السودانية وتراثها ."
         />
-        <meta property="og:image" content="" />
+        <meta property="og:image" content="https://res.cloudinary.com/nextjs-bayan/image/upload/v1733487702/%D9%85%D8%AA%D8%AC%D8%B1-%D9%87%D9%88%D8%A7%D9%83-%D8%A7%D9%84%D8%B5%D9%81%D8%AD%D8%A9-%D8%A7%D9%84%D8%B1%D8%A6%D9%8A%D8%B3%D9%8A%D8%A9-12-06-2024_02_01_PM_su4jt2.png" />
         <meta property="og:url" content={process.env.NEXT_PUBLIC_BASE_URL} />
         <meta property="og:type" content="website" />
 
@@ -56,7 +56,7 @@ export default function RootLayout({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="متجر هوانا" />
         <meta name="twitter:description" content="هي منصة المنتجات والعطور السودانية وهي وجهة مميزة تهدف إلى تسليط الضوء على المنتجات المحلية والعطور التقليدية التي تتميز بها السودان. تبرز هذه المنصة الحرف اليدوية والفنون التقليدية، كما تسعى لدعم الحرفيين المحليين وتمكينهم من الوصول إلى أسواق أوسع ، وتهدف المنصة أيضًا إلى تعزيز الوعي بالثقافة السودانية وتراثها ." />
-        <meta name="twitter:image" content="https://example.com/og-image.jpg" />
+        <meta name="twitter:image" content="https://res.cloudinary.com/nextjs-bayan/image/upload/v1733487702/%D9%85%D8%AA%D8%AC%D8%B1-%D9%87%D9%88%D8%A7%D9%83-%D8%A7%D9%84%D8%B5%D9%81%D8%AD%D8%A9-%D8%A7%D9%84%D8%B1%D8%A6%D9%8A%D8%B3%D9%8A%D8%A9-12-06-2024_02_01_PM_su4jt2.png" />
       </head>
       <body
         className={`${cairo.variable} bg-[#FBFBFC] font-sans flex flex-col min-h-screen justify-between relative`}
