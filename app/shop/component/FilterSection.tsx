@@ -55,11 +55,10 @@ function FilterSection({
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`w-4 h-4 ${
-                          i < rating
-                            ? "text-yellow-400 fill-yellow-400"
-                            : "text-muted-foreground"
-                        }`}
+                        className={`w-4 h-4 ${i < rating
+                          ? "text-yellow-400 fill-yellow-400"
+                          : "text-muted-foreground"
+                          }`}
                       />
                     ))}
                   </Label>
@@ -83,6 +82,7 @@ function FilterSection({
                 <RadioGroupItem
                   id="category-packages"
                   value="packages"
+                  checked={filter.packagesChecked}
                   onClick={onlyPackages}
                 />
               </div>
@@ -91,6 +91,8 @@ function FilterSection({
                 <RadioGroupItem
                   id="category-products"
                   value="products"
+                  checked={filter.productsChecked}
+
                   onClick={onlyProducts}
                 />
               </div>

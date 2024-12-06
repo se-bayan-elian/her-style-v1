@@ -110,13 +110,18 @@ const Product: React.FC<ProductProps> = ({
             <ShoppingBag className="ml-2" />
           </button>
           <div className="text-right">
-            <p className="text-purple font-bold">{price.toFixed(2)} ر.س</p>
-            <div className="flex items-center">
+            <p className="text-purple font-bold flex flex-row-reverse">
+              <span>{price.toFixed(2)}</span>
+              <span>ر.س</span>
+
+            </p>
+            <div className="flex items-center ">
               <p className="text-red text-sm mr-2">
                 {100 - Math.floor((price / originalPrice) * 100)}%
               </p>
-              <p className="text-gray-500 line-through text-sm">
-                {originalPrice.toFixed(2)} ر.س
+              <p className="text-gray-500 line-through text-sm flex gap-0 justify-start flex-row-reverse">
+                <span>{originalPrice.toFixed(2)}</span> 
+                <span>ر.س</span> 
               </p>
             </div>
           </div>

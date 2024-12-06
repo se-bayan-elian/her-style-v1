@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer"
 import { Slider } from '@/components/ui/slider'
 
-const FilterContent = ({ onlyPackages, onlyProducts, handlePriceFilter ,  handleRatingFilter}:{ onlyPackages:()=>void, handlePriceFilter: (min: number, max: number) => void, onlyProducts:()=>void,  handleRatingFilter:(rating:number)=>void}) => {
+const FilterContent = ({filter,onlyPackages, onlyProducts, handlePriceFilter ,  handleRatingFilter}:{filter:any, onlyPackages:()=>void, handlePriceFilter: (min: number, max: number) => void, onlyProducts:()=>void,  handleRatingFilter:(rating:number)=>void}) => {
   const [priceRange, setPriceRange] = useState([0, 1000])
   
   return (
@@ -43,11 +43,11 @@ const FilterContent = ({ onlyPackages, onlyProducts, handlePriceFilter ,  handle
           <RadioGroup defaultValue="packages">
               <div className="flex items-center justify-end space-x-2 mb-2">
                 <Label htmlFor="category-packages">بكجات</Label>
-                <RadioGroupItem id="category-packages" value="packages" onClick={onlyProducts} />
+                <RadioGroupItem id="category-packages" value="packages" checked={filter.packagesChecked} onClick={onlyProducts} />
               </div>
               <div className="flex items-center justify-end space-x-2 mb-2">
                 <Label htmlFor="category-products">منتج</Label>
-                <RadioGroupItem id="category-products" value="products" onClick={ onlyPackages } />
+                <RadioGroupItem id="category-products" value="products" checked={filter.productsChecked} onClick={ onlyPackages } />
               </div>
             </RadioGroup>
           </AccordionContent>
@@ -95,7 +95,7 @@ function MobileFilterSection({filter, onlyPackages, onlyProducts, handlePriceFil
             </Button>
           </DrawerTrigger>
           <DrawerContent>
-            <FilterContent  onlyPackages={onlyPackages} onlyProducts={onlyProducts} handlePriceFilter={handlePriceFilter} handleRatingFilter={handleRatingFilter} />
+            <FilterContent filter={filter} onlyPackages={onlyPackages} onlyProducts={onlyProducts} handlePriceFilter={handlePriceFilter} handleRatingFilter={handleRatingFilter} />
           </DrawerContent>
         </Drawer>
       </div>

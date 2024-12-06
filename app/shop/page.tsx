@@ -13,7 +13,7 @@ function Page() {
 
   const [filter, setFilter] = useState({
     rating: 0,
-    productsChecked: false,
+    productsChecked: true,
     packagesChecked: false,
     priceRange: { min: 0, max: 5000 },
   });
@@ -97,6 +97,7 @@ function Page() {
   } = useInfiniteQuery({
     queryKey: ["shop-products", priceRange, stars, isOnlyPackages],
     queryFn: fetchProducts,
+    enabled: !isOnlyPackages,
     getNextPageParam: (lastPage, pages) => {
       const currentPage = lastPage.data.data.options.page;
       const totalPages = Math.ceil(
@@ -149,15 +150,14 @@ function Page() {
     isLoadingProducts || (areProductsExhausted && isLoadingPackages);
 
   const loadMore = () => {
-    // First try to load more products
     if (hasNextProducts) {
-      fetchNextProducts();
-    }
-    // If no more products, start loading packages
-    else if (hasNextPackages) {
-      fetchNextPackages();
+      fetchNextProducts(); // Load more products if available
+    } else if (!hasNextProducts && hasNextPackages) {
+      fetchNextPackages(); // Start loading packages if products are exhausted
     }
   };
+
+  const hasMore = hasNextProducts || hasNextPackages;
 
   return (
     <div className="shop-container  mx-auto w-[95%] md:w-[90%] lg:w-[80%] py-4">
@@ -176,23 +176,21 @@ function Page() {
           packages={
             isOnlyPackages || areProductsExhausted
               ? packagesData?.pages.flatMap(
-                  (page) => page.data.data.packages
-                ) || []
+                (page) => page.data.data.packages
+              ) || []
               : []
           }
           products={
             !isOnlyPackages
               ? productsData?.pages.flatMap(
-                  (page) => page.data.data.products
-                ) || []
+                (page) => page.data.data.products
+              ) || []
               : []
           }
           isLoading={isLoading}
           loadMore={loadMore}
           hasMore={
-            !isOnlyPackages
-              ? hasNextProducts
-              : isOnlyPackages && hasNextPackages
+            hasMore
           }
           isFetchingNext={
             !isOnlyPackages
