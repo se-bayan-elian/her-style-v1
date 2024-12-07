@@ -1,6 +1,5 @@
 "use client";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import axiosInstance from "@/utils/axiosInstance";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { getCookie } from "cookies-next";
@@ -12,11 +11,9 @@ import { RootState } from "@/utils/store";
 import { Profile } from "../profile/page";
 import { getCart } from "../(components)/Cart";
 import axios from "axios";
+import useAxiosInstance from "@/utils/axiosInstance";
 
-const fetchProfile = async (): Promise<Profile> => {
-  const response = await axiosInstance.get("profile");
-  return response.data.data;
-};
+
 const getExchangeRate = async () => {
   const API_KEY = process.env.NEXT_PUBLIC_EXCHANGE_RATES_API_KEY;
   try {
@@ -37,7 +34,11 @@ const PayPalPayment = () => {
   const [isPaying, setIsPaying] = useState(false);
   const router = useRouter();
   const address = useSelector((state: RootState) => state.address);
-
+  const axiosInstance = useAxiosInstance()
+  const fetchProfile = async (): Promise<Profile> => {
+    const response = await axiosInstance.get("profile");
+    return response.data.data;
+  };
   const {
     data: profile,
     isLoading: isProfileLoading,
@@ -52,7 +53,7 @@ const PayPalPayment = () => {
     error: isCartError,
   } = useQuery({
     queryKey: ["cart"],
-    queryFn: getCart,
+    queryFn: () => getCart(axiosInstance),
   });
   useEffect(() => {
     if (!address) {

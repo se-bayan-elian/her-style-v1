@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axiosInstance from "@/utils/axiosInstance";
 
 import { useDispatch } from "react-redux";
 import { addName, deleteName } from "@/utils/cart";
@@ -19,6 +18,7 @@ import Loading from "../(components)/Loading";
 import Error from "next/error";
 import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 export interface Profile {
   _id: string;
@@ -32,10 +32,7 @@ export interface Profile {
   phoneNumber: string;
 }
 
-const fetchProfile = async (): Promise<Profile> => {
-  const response = await axiosInstance.get("profile");
-  return response.data.data;
-};
+
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -44,6 +41,11 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState(query.get("tab") || "profile");
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+  const axiosInstance = useAxiosInstance()
+  const fetchProfile = async (): Promise<Profile> => {
+    const response = await axiosInstance.get("profile");
+    return response.data.data;
+  };
 
   const updateProfile = async (data: { name: string; phoneNumber: string }) => {
     if (data.name !== "") {

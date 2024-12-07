@@ -1,42 +1,76 @@
-'use client'
+'use client';
+
 import axios from 'axios';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
-import { cookies } from 'next/headers';
+import { useEffect, useLayoutEffect } from 'react';
 
-const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://herstyleapi.onrender.com/api/v1',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials:true
-});
+const useAxiosInstance = () => {
+  // Create Axios instance
+  const axiosInstance = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://herstyleapi.onrender.com/api/v1',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    withCredentials: true, // Ensure cookies are sent
+  });
 
+  useLayoutEffect(() => {
+    // Request Interceptor
+    const requestInterceptor = axiosInstance.interceptors.request.use(
+      (config) => {
+        const token = getCookie('auth_token'); // Retrieve auth token from cookies
+        console.log('token',token)
+        if (token && !config.headers._retry) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = getCookie('auth_token')
-    config.headers.Authorization = !config.headers._retry && token ?` Bearer ${token}` : config.headers.Authorization;
-    return config;
-  }
-);
+    // Response Interceptor
+    const responseInterceptor = axiosInstance.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
 
+        // If Unauthorized (401) and not retried yet, attempt to refresh token
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
 
+          try {
+            const { data } = await axios.post(
+              `${process.env.NEXT_PUBLIC_API_URL || 'https://herstyleapi.onrender.com/api/v1'}/auth/refresh`,
+              { withCredentials: true } // Ensure cookies are sent
+            );
 
-axiosInstance.interceptors.response.use(
-  (response) => response, // Handle successful responses
-  async (error: any) => {
-    // Check if the error response exists and the status is 401 (Unauthorized)
-    if (error.response && error.response.status === 401) {
-      // Remove user-related data from localStorage and cookies
-      localStorage.removeItem('user');
-      localStorage.removeItem('role');
-      
-      // Make sure you are using the correct method to delete the cookie
-      deleteCookie('auth_token'); // Make sure 'auth_token' is the correct cookie name
-    }
+            // Update auth token in cookies
+            setCookie('auth_token', data.auth_token, { path: '/' });
+            // Retry the original request with new token
+            originalRequest.headers.Authorization = `Bearer ${data.auth_token}`;
+            return axiosInstance(originalRequest);
+          } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError);
+            // Remove cookies and local storage data
+            deleteCookie('auth_token');
+            deleteCookie('refresh_token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('role');
+          }
+        }
 
-    // Return the error to propagate it
-    return Promise.reject(error);
-  })
+        return Promise.reject(error);
+      }
+    );
 
-export default axiosInstance;
+    // Cleanup interceptors on component unmount
+    return () => {
+      axiosInstance.interceptors.request.eject(requestInterceptor);
+      axiosInstance.interceptors.response.eject(responseInterceptor);
+    };
+  }, [axiosInstance]);
+
+  return axiosInstance;
+};
+
+export default useAxiosInstance;

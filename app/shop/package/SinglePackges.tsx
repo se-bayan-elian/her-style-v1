@@ -1,16 +1,18 @@
 import Product from "@/app/(components)/Product";
-import axiosInstance from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import ProductSkelton from "@/app/(components)/ProductSkelton";
 import React from "react";
+import useAxiosInstance from "@/utils/axiosInstance";
 
-async function getPackages() {
-  const { data } = await axiosInstance.get("packages");
-  return data.data;
-}
+
 
 function SinglePackges() {
   // New query for packages
+  const axiosInstance = useAxiosInstance()
+  async function getPackages() {
+    const { data } = await axiosInstance.get("packages");
+    return data.data;
+  }
   const {
     data: packagesData,
     isLoading: packagesLoading,

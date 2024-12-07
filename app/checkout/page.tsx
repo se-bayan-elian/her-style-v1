@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import axiosInstance from "@/utils/axiosInstance";
 import { useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setAddress, clearAddress } from "@/utils/addressSlice";
 import { getCookie } from "cookies-next";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 type AddressFormData = {
   firstLine: string;
@@ -20,29 +20,30 @@ type AddressFormData = {
   paymentMethod: string;
 };
 
-const submitAddress = async (data: AddressFormData) => {
-  try {
-    const response = await axiosInstance.post("/cart/checkout", {
-      paymentMethod: "COD",
-      address: {
-        firstLine: data.firstLine,
-        googleLocation: data.googleLocation,
-        city: data.city,
-        postalCode: data.postalCode,
-        street: data.street,
-        country: "السعودية", // Default country
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
 
 const AddressAndPaymentForm = () => {
   const router = useRouter();
   const [apiError, setApiError] = useState("");
   const dispatch = useDispatch();
+  const axiosInstance = useAxiosInstance()
+  const submitAddress = async (data: AddressFormData) => {
+    try {
+      const response = await axiosInstance.post("/cart/checkout", {
+        paymentMethod: "COD",
+        address: {
+          firstLine: data.firstLine,
+          googleLocation: data.googleLocation,
+          city: data.city,
+          postalCode: data.postalCode,
+          street: data.street,
+          country: "السعودية", // Default country
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
 
   const address = useSelector((state: any) => state.address); // Access the address state from Redux
 

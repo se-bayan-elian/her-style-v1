@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer"
 import { Slider } from '@/components/ui/slider'
 
-const FilterContent = ({filter,onlyPackages, onlyProducts, handlePriceFilter ,  handleRatingFilter}:{filter:any, onlyPackages:()=>void, handlePriceFilter: (min: number, max: number) => void, onlyProducts:()=>void,  handleRatingFilter:(rating:number)=>void}) => {
+const FilterContent = ({ filter, onlyPackages, onlyProducts, handlePriceFilter, handleRatingFilter }: { filter: any, onlyPackages: () => void, handlePriceFilter: (min: number, max: number) => void, onlyProducts: () => void, handleRatingFilter: (rating: number) => void }) => {
   const [priceRange, setPriceRange] = useState([0, 1000])
-  
+
   return (
     <div className="filter-section bg-white p-4 rounded-lg shadow">
       <div className='flex items-center justify-end text-purple mb-4'>
@@ -27,10 +27,10 @@ const FilterContent = ({filter,onlyPackages, onlyProducts, handlePriceFilter ,  
                   <Label htmlFor={`rating-${rating}`} className="flex items-center space-x-1 mr-2">
                     <p className='text-nowrap'> أكثر من {rating - 0.5} </p>
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}/>
+                      <Star key={i} className={`w-4 h-4 ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
                     ))}
                   </Label>
-                  <RadioGroupItem value={`${rating}`} id={`rating-${rating}`} onClick={()=>handleRatingFilter(rating)} />
+                  <RadioGroupItem value={`${rating}`} id={`rating-${rating}`} onClick={() => handleRatingFilter(rating)} />
                 </div>
               ))}
             </RadioGroup>
@@ -40,21 +40,21 @@ const FilterContent = ({filter,onlyPackages, onlyProducts, handlePriceFilter ,  
         <AccordionItem value="categories">
           <AccordionTrigger className="text-right">التصنيفات</AccordionTrigger>
           <AccordionContent>
-          <RadioGroup defaultValue="packages">
+            <RadioGroup defaultValue="packages">
               <div className="flex items-center justify-end space-x-2 mb-2">
                 <Label htmlFor="category-packages">بكجات</Label>
-                <RadioGroupItem id="category-packages" value="packages" checked={filter.packagesChecked} onClick={onlyProducts} />
+                <RadioGroupItem id="category-packages" value="packages" checked={filter.packagesChecked} onClick={onlyPackages} />
               </div>
               <div className="flex items-center justify-end space-x-2 mb-2">
                 <Label htmlFor="category-products">منتج</Label>
-                <RadioGroupItem id="category-products" value="products" checked={filter.productsChecked} onClick={ onlyPackages } />
+                <RadioGroupItem id="category-products" value="products" checked={filter.productsChecked} onClick={onlyProducts} />
               </div>
             </RadioGroup>
           </AccordionContent>
         </AccordionItem>
 
         <AccordionItem value="price">
-        <AccordionTrigger className="text-right">السعر</AccordionTrigger>
+          <AccordionTrigger className="text-right">السعر</AccordionTrigger>
           <AccordionContent>
             <div className="space-y-4 mt-2" >
               <Slider
@@ -82,23 +82,23 @@ const FilterContent = ({filter,onlyPackages, onlyProducts, handlePriceFilter ,  
 }
 
 
-function MobileFilterSection({filter, onlyPackages, onlyProducts, handlePriceFilter, handleRatingFilter}:{filter:any, onlyPackages:()=>void, onlyProducts:()=>void, handlePriceFilter:(min: number, max: number) => void, handleRatingFilter:(rating:number)=>void}) {
+function MobileFilterSection({ filter, onlyPackages, onlyProducts, handlePriceFilter, handleRatingFilter }: { filter: any, onlyPackages: () => void, onlyProducts: () => void, handlePriceFilter: (min: number, max: number) => void, handleRatingFilter: (rating: number) => void }) {
   const [open, setOpen] = useState(false)
 
   return (
-      <div className=" block lg:hidden">
-        <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Filter className="w-4 h-4" />
-              الفلترة
-            </Button>
-          </DrawerTrigger>
-          <DrawerContent>
-            <FilterContent filter={filter} onlyPackages={onlyPackages} onlyProducts={onlyProducts} handlePriceFilter={handlePriceFilter} handleRatingFilter={handleRatingFilter} />
-          </DrawerContent>
-        </Drawer>
-      </div>
+    <div className=" block lg:hidden">
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerTrigger asChild>
+          <Button variant="outline" className="flex items-center gap-2">
+            <Filter className="w-4 h-4" />
+            الفلترة
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <FilterContent filter={filter} onlyPackages={onlyPackages} onlyProducts={onlyProducts} handlePriceFilter={handlePriceFilter} handleRatingFilter={handleRatingFilter} />
+        </DrawerContent>
+      </Drawer>
+    </div>
   )
 }
 

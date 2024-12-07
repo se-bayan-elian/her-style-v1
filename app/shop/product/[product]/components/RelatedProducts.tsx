@@ -1,21 +1,22 @@
 import { toast } from "@/hooks/use-toast";
-import axiosInstance from "@/utils/axiosInstance";
+import useAxiosInstance from "@/utils/axiosInstance";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ShoppingBag, ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-const addToCartMutation = async (productId: string) => {
-  const response = await axiosInstance.post(`cart/add-product/${productId}`, {
-    quantity: 1,
-  });
-  return response.data;
-};
+
 
 function RelatedProducts({ data }: { data: any }) {
   const queryClient = useQueryClient();
-
+  const axiosInstance = useAxiosInstance()
+  const addToCartMutation = async (productId: string) => {
+    const response = await axiosInstance.post(`cart/add-product/${productId}`, {
+      quantity: 1,
+    });
+    return response.data;
+  };
   const mutation = useMutation({
     mutationFn: (productId: string) => addToCartMutation(productId),
     onSuccess: () => {
@@ -85,11 +86,10 @@ function RelatedProducts({ data }: { data: any }) {
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-4 h-4 ${
-                      i < item.stars
+                    className={`w-4 h-4 ${i < item.stars
                         ? "text-yellow-400 fill-current"
                         : "text-gray-300"
-                    }`}
+                      }`}
                   />
                 ))}
               </div>

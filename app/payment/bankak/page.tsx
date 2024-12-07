@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import axiosInstance from "@/utils/axiosInstance";
 import { getCookie } from "cookies-next";
 import { useDispatch } from "react-redux";
 import { clearAddress } from "@/utils/addressSlice";
@@ -11,11 +10,13 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { getCart } from "@/app/(components)/Cart";
 import { useEffect } from "react";
 import Loading from "@/app/(components)/Loading";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 const PaymentInstructions = () => {
   const router = useRouter();
   const addressCookies = getCookie("address");
   const dispatch = useDispatch();
+  const axiosInstance = useAxiosInstance()
 
   const {
     data: cart,
@@ -23,7 +24,7 @@ const PaymentInstructions = () => {
     error,
   } = useQuery({
     queryKey: ["cart"],
-    queryFn: getCart,
+    queryFn: () => getCart(axiosInstance),
   });
 
   // Mutation for creating an order

@@ -19,8 +19,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Loading from "./Loading";
 import CartItemsSkeleton from "./cartItemSkeleton";
 import { Skeleton } from "@/components/ui/skeleton";
+import useAxiosInstance from "@/utils/axiosInstance";
 
-export async function getCart() {
+export async function getCart(axiosInstance: any) {
   try {
     const response = await axiosInstance.get("/cart");
     return response.data;
@@ -28,31 +29,33 @@ export async function getCart() {
     throw error;
   }
 }
-
-async function deleteProductFromCart(productId: string, type: string) {
-  try {
-    const response = await axiosInstance.delete(
-      `/cart/remove-${type}/${productId}`
-    );
-    return response.data;
-  } catch (error) {}
-}
-
-async function applyCoupon(code: string) {
-  try {
-    const response = await axiosInstance.post("cart/apply-coupon", { code });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-}
-
 export default function Cart() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isBlock, setIsBlock] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const path = usePathname();
+  const axiosInstance = useAxiosInstance()
+
+
+  async function deleteProductFromCart(productId: string, type: string) {
+    try {
+      const response = await axiosInstance.delete(
+        `/cart/remove-${type}/${productId}`
+      );
+      return response.data;
+    } catch (error) { }
+  }
+
+  async function applyCoupon(code: string) {
+    try {
+      const response = await axiosInstance.post("cart/apply-coupon", { code });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["cart"],
     queryFn: getCart,
@@ -108,13 +111,13 @@ export default function Cart() {
         {data?.data?.carts[0]?.products?.length +
           data?.data?.carts[0]?.packages?.length >
           0 && (
-          <Badge className="absolute bg-purple hover:bg-purple flex items-center justify-center -top-2 -right-2 h-6 w-6 rounded-full p-2">
-            <p>
-              {data?.data?.carts[0]?.products?.length +
-                data?.data?.carts[0]?.packages?.length}
-            </p>
-          </Badge>
-        )}
+            <Badge className="absolute bg-purple hover:bg-purple flex items-center justify-center -top-2 -right-2 h-6 w-6 rounded-full p-2">
+              <p>
+                {data?.data?.carts[0]?.products?.length +
+                  data?.data?.carts[0]?.packages?.length}
+              </p>
+            </Badge>
+          )}
       </Button>
 
       {isOpen && !isBlock && (
@@ -171,11 +174,10 @@ export default function Cart() {
             ) : cartItems.length > 0 ? (
               <div className="w-full ">
                 <div
-                  className={`${
-                    cartItems.length > 2
-                      ? "overflow-y-scroll h-[180px]"
-                      : "overflow-y-clip h-fit"
-                  }  overflow-hidden cart-items p-0 m-0`}
+                  className={`${cartItems.length > 2
+                    ? "overflow-y-scroll h-[180px]"
+                    : "overflow-y-clip h-fit"
+                    }  overflow-hidden cart-items p-0 m-0`}
                 >
                   {cartItems.map((item: any) => {
                     return (
@@ -183,11 +185,10 @@ export default function Cart() {
                         key={item._id}
                         id={item.productId ? item.productId : item.packageId}
                         price={item.totalPrice / item.quantity}
-                        name={`${
-                          item.productId
-                            ? item.productId.name
-                            : item.packageId?.name
-                        }`}
+                        name={`${item.productId
+                          ? item.productId.name
+                          : item.packageId?.name
+                          }`}
                         image={
                           item.productId
                             ? item.productId.images[0]
@@ -196,10 +197,9 @@ export default function Cart() {
                         quantity={item.quantity}
                         onDelete={() =>
                           handleDeleteProduct(
-                            `${
-                              item.productId
-                                ? item.productId._id
-                                : item.packageId._id
+                            `${item.productId
+                              ? item.productId._id
+                              : item.packageId._id
                             }`,
                             item.productId ? "product" : "package"
                           )

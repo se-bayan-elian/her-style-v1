@@ -22,7 +22,6 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import axiosInstance from "@/utils/axiosInstance";
 import { CldUploadButton } from "next-cloudinary";
 import {
   AlertDialog,
@@ -38,6 +37,7 @@ import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import Pagination from "@/app/(components)/Pagination";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 type Product = {
   _id: string;
@@ -66,6 +66,8 @@ type Package = {
 
 function Productpage() {
   const queryClient = useQueryClient();
+  const axiosInstance = useAxiosInstance()
+
   const { toast } = useToast();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -171,7 +173,7 @@ function Productpage() {
         description: "تم إضافة المنتج بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-products",page,limit] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products", page, limit] });
       resetForm();
     },
     onError: () => {
@@ -193,7 +195,7 @@ function Productpage() {
         description: "تم تحديث المنتج بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-products",page,limit] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products", page, limit] });
       resetForm();
       setIsEditing(false);
     },
@@ -216,7 +218,7 @@ function Productpage() {
         description: "تم حذف المنتج بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-products",page,limit] });
+      queryClient.invalidateQueries({ queryKey: ["admin-products", page, limit] });
     },
     onError: () => {
       toast({
@@ -237,22 +239,22 @@ function Productpage() {
         name === "originalPrice" || name === "finalPrice"
           ? { ...prev.price, [name]: Number(value) || 0 }
           : name === "tags"
-          ? value.split(",").map((tag) => tag.trim())
-          : ["quantity", "availableQuantity"].includes(name)
-          ? Number(value)
-          : value;
+            ? value.split(",").map((tag) => tag.trim())
+            : ["quantity", "availableQuantity"].includes(name)
+              ? Number(value)
+              : value;
 
       return {
         ...prev,
         [name]: updatedValue,
         ...(name === "originalPrice" || name === "finalPrice"
           ? {
-              price: {
-                originalPrice: prev.price?.originalPrice || 0,
-                finalPrice: prev.price?.finalPrice || 0,
-                [name]: Number(value) || 0,
-              },
-            }
+            price: {
+              originalPrice: prev.price?.originalPrice || 0,
+              finalPrice: prev.price?.finalPrice || 0,
+              [name]: Number(value) || 0,
+            },
+          }
           : {}),
       };
     });
@@ -598,8 +600,8 @@ function Productpage() {
                 ? "تحديث..."
                 : "تحديث المنتج"
               : createProductMutation.isPending
-              ? "إضافة..."
-              : "إضافة منتج"}
+                ? "إضافة..."
+                : "إضافة منتج"}
           </Button>
         </form>
 

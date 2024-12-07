@@ -3,7 +3,6 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircleIcon, XCircleIcon, RefreshCcwIcon } from "lucide-react"; // Lucide icons
-import axiosInstance from "@/utils/axiosInstance";
 import { useDispatch } from "react-redux";
 import { clearAddress } from "@/utils/addressSlice";
 import { getCookie } from "cookies-next";

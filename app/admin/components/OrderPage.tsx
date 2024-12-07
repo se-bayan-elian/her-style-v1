@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axiosInstance from "@/utils/axiosInstance";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -27,6 +26,7 @@ import { useForm } from "react-hook-form";
 import Alert from "../../(components)/Alert";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 function OrderPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -36,23 +36,25 @@ function OrderPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [count, setCount] = useState(0);
+  const axiosInstance = useAxiosInstance()
+
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["orders", page, limit],
-    queryFn: async() => {
-     const response = await axiosInstance.get(`/orders`,{
-      params: { page, limit }
+    queryFn: async () => {
+      const response = await axiosInstance.get(`/orders`, {
+        params: { page, limit }
       });
       setCount(response?.data?.data?.options?.count || 0);
-       return response;
+      return response;
     },
   });
 
   const updateOrderStatus = useMutation({
-    mutationFn: ({ orderId, status }: { orderId: string; status: string }) =>axiosInstance.put(`orders/${orderId}`, { status })
-      ,
+    mutationFn: ({ orderId, status }: { orderId: string; status: string }) => axiosInstance.put(`orders/${orderId}`, { status })
+    ,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["orders",page,limit] });
+      queryClient.invalidateQueries({ queryKey: ["orders", page, limit] });
     },
   });
   const updateOrderPaymentStatus = useMutation({
@@ -64,7 +66,7 @@ function OrderPage() {
       paymentStatus: string;
     }) => axiosInstance.put(`orders/${orderId}`, { paymentStatus }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["orders",page,limit] });
+      queryClient.invalidateQueries({ queryKey: ["orders", page, limit] });
     },
   });
 
@@ -318,8 +320,8 @@ function OrderPage() {
               )}
             </TableBody>
           </Table>
-          
-      <Pagination
+
+          <Pagination
             currentPage={page}
             totalCount={count}
             limit={limit}
@@ -402,6 +404,19 @@ function OrderPage() {
                         <TableRow key={product.productId._id}>
                           <TableCell className="text-right">
                             {product.productId.name}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {product.quantity}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {product.totalPrice} ريال
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {selectedOrder?.cart.packages.map((product) => (
+                        <TableRow key={product.packageId._id}>
+                          <TableCell className="text-right">
+                            {product.packageId.name}
                           </TableCell>
                           <TableCell className="text-right">
                             {product.quantity}

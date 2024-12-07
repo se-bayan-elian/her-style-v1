@@ -3,17 +3,19 @@ import { Star } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
-import axiosInstance from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Autoplay, Pagination } from "swiper/modules";
+import useAxiosInstance from "@/utils/axiosInstance";
 
-async function getTestmonials() {
-  const response = await axiosInstance.get("/comments");
-  return response.data;
-}
+
 
 function Testmonial() {
+  const axiosInstance = useAxiosInstance()
+  async function getTestmonials() {
+    const response = await axiosInstance.get("/comments");
+    return response.data;
+  }
   const { data, isLoading, error } = useQuery({
     queryKey: ["testmonials"],
     queryFn: getTestmonials,
@@ -80,11 +82,10 @@ function Testmonial() {
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-5 h-5 ${
-                      i < comment.stars
+                    className={`w-5 h-5 ${i < comment.stars
                         ? "text-yellow-400 fill-current"
                         : "text-gray-300"
-                    }`}
+                      }`}
                   />
                 ))}
               </div>

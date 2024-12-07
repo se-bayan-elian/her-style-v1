@@ -41,8 +41,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CldUploadButton } from "next-cloudinary";
 import { useToast } from "@/hooks/use-toast";
-import axiosInstance from "@/utils/axiosInstance";
 import Pagination from "@/app/(components)/Pagination";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 // Enum for Integration Types
 const INTEGRATION_TYPES = {
@@ -74,6 +74,7 @@ type Package = {
 
 function SliderPage() {
   const queryClient = useQueryClient();
+  const axiosInstance = useAxiosInstance()
   const { toast } = useToast();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -172,7 +173,7 @@ function SliderPage() {
       setIsLoading(false);
     }
   };
-  const getPackageOrProduct = async (id: string,integration_type:string) => {
+  const getPackageOrProduct = async (id: string, integration_type: string) => {
     try {
       let response;
       switch (integration_type) {
@@ -348,7 +349,7 @@ function SliderPage() {
     setFormData(slider);
     setIsEditing(true);
     if (slider.integration_type !== "URL") {
-      const singleItem = await getPackageOrProduct(slider.link,slider.integration_type);
+      const singleItem = await getPackageOrProduct(slider.link, slider.integration_type);
       setSearchTerm(singleItem?.name);
     } else setSearchTerm(slider.link); // Populate search term with link
     formRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -456,11 +457,10 @@ function SliderPage() {
                     <Input
                       id="link"
                       type="text"
-                      placeholder={`ابحث عن ${
-                        formData.integration_type === "PRODUCT"
+                      placeholder={`ابحث عن ${formData.integration_type === "PRODUCT"
                           ? "المنتجات"
                           : "الباقات"
-                      }...`}
+                        }...`}
                       value={searchTerm}
                       dir="rtl"
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -581,8 +581,8 @@ function SliderPage() {
                 ? "تحديث..."
                 : "تحديث البنر"
               : createSliderMutation.isPending
-              ? "إضافة..."
-              : "إضافة سلايدر"}
+                ? "إضافة..."
+                : "إضافة سلايدر"}
           </Button>
         </form>
 

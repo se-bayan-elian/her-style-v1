@@ -12,7 +12,6 @@ import "swiper/css/pagination";
 import { Button } from "@/components/ui/button";
 import RelatedProducts from "../product/[product]/components/RelatedProducts";
 import Reviews from "../product/[product]/components/Reviews";
-import axiosInstance from "@/utils/axiosInstance";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import SingleProductSkeleton from "../component/SingleProductSkeleton";
@@ -28,19 +27,21 @@ import { compass } from "@cloudinary/url-gen/qualifiers/gravity";
 import { Cloudinary, Transformation } from "@cloudinary/url-gen";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import useAxiosInstance from "@/utils/axiosInstance";
 
-const addToCartMutation = async (productId: string) => {
-  const response = await axiosInstance.post(`cart/add-package/${productId}`, {
-    quantity: 1,
-  });
-  console.log(productId, response);
-  return response.data;
-};
+
 
 export default function PackagePage() {
   const queryClient = useQueryClient();
   const params = useParams();
-
+  const axiosInstance = useAxiosInstance()
+  const addToCartMutation = async (productId: string) => {
+    const response = await axiosInstance.post(`cart/add-package/${productId}`, {
+      quantity: 1,
+    });
+    console.log(productId, response);
+    return response.data;
+  };
   const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
 
   const mutation: any = useMutation({
@@ -185,8 +186,8 @@ export default function PackagePage() {
                     <Star
                       key={i}
                       className={`w-4 h-4 ${i < Package.stars
-                          ? "text-yellow-400 fill-current"
-                          : "text-gray-300"
+                        ? "text-yellow-400 fill-current"
+                        : "text-gray-300"
                         }`}
                     />
                   ))}

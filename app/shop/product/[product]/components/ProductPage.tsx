@@ -8,7 +8,6 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import axiosInstance from "@/utils/axiosInstance";
 import Reviews from "./Reviews";
 import RecommendedProducts from "./RecommendedProducts";
 
@@ -18,18 +17,21 @@ import "swiper/css/pagination";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import SingleProductSkeleton from "@/app/shop/component/SingleProductSkeleton";
+import useAxiosInstance from "@/utils/axiosInstance";
 
-const addToCartMutation = async (productId: string) => {
-  const response = await axiosInstance.post(`cart/add-product/${productId}`, {
-    quantity: 1,
-  });
-  return response.data;
-};
+
 
 export default function ProductPage() {
   const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const params = useParams();
+  const axiosInstance = useAxiosInstance()
+  const addToCartMutation = async (productId: string) => {
+    const response = await axiosInstance.post(`cart/add-product/${productId}`, {
+      quantity: 1,
+    });
+    return response.data;
+  };
   const mutation: any = useMutation({
     mutationFn: (productId: string) => addToCartMutation(productId),
     onSuccess: () => {

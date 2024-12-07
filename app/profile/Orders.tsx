@@ -17,11 +17,11 @@ import {
 } from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import axiosInstance from "@/utils/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import Image from "next/image";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 export interface Order {
   _id: string;
@@ -62,10 +62,7 @@ export interface Order {
   paymentId?: string;
 }
 
-const fetchOrders = async () => {
-  const response = await axiosInstance.get("orders");
-  return response.data;
-};
+
 
 // Utility functions for status handling
 const getStatusColor = (status: string) => {
@@ -139,6 +136,11 @@ function Orders({ defaultId }: { defaultId: string }) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>();
   const initialRender = useRef<boolean>(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const axiosInstance = useAxiosInstance()
+  const fetchOrders = async () => {
+    const response = await axiosInstance.get("orders");
+    return response.data;
+  };
   const {
     data: ordersData,
     isLoading: isOrdersLoading,

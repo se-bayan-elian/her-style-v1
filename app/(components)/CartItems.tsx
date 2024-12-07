@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import Image from "next/image";
 import { useDispatch } from "react-redux";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axiosInstance from "@/utils/axiosInstance";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 function CartItems({
   id,
@@ -27,6 +27,7 @@ function CartItems({
 }) {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+  const axiosInstance = useAxiosInstance()
 
   async function updatePackageQuantity(
     id: any,
@@ -41,7 +42,7 @@ function CartItems({
         }
       );
       return response.data;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   const updateMutation = useMutation({
@@ -63,9 +64,8 @@ function CartItems({
 
   return (
     <div
-      className={`grid grid-cols-12 md:gap-4 gap-2 mb-4 w-full   ${
-        stateOfDeleting ? "opacity-50" : ""
-      }`}
+      className={`grid grid-cols-12 md:gap-4 gap-2 mb-4 w-full   ${stateOfDeleting ? "opacity-50" : ""
+        }`}
     >
       <p className="col-span-3 text-sm  text-right text-muted-foreground   mb-auto">
         <span className="text-xs">: الإجمالي</span>

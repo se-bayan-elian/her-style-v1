@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import axiosInstance from "@/utils/axiosInstance";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 
 import Alert from "./Alert";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 interface SignupProps {
   isSignupOpen: boolean;
@@ -32,6 +32,7 @@ interface SignupFormData {
 
 function Signup({ isSignupOpen, setIsSignupOpen }: SignupProps) {
   const [error, setError] = useState<string | null>(null);
+  const axiosInstance = useAxiosInstance()
 
   const {
     register,

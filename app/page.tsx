@@ -13,10 +13,11 @@ import ProductSkelton from "./(components)/ProductSkelton";
 import Testmonial from "./(components)/Testmonial";
 import { openLogin } from "@/utils/loginSlice";
 import { useDispatch } from "react-redux";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 export default function Home() {
   const dispatch = useDispatch();
-
+  const axiosInstance = useAxiosInstance()
   async function getProducts() {
     const { data: products } = await axiosInstance.get("products?tags=green");
     const { data: packages } = await axiosInstance.get("packages?tags=green");

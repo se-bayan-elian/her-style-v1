@@ -31,12 +31,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import axiosInstance from "@/utils/axiosInstance";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, CalendarIcon, Trash2, Edit } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import Pagination from "@/app/(components)/Pagination";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 type Coupon = {
   _id: string;
@@ -48,26 +48,7 @@ type Coupon = {
   expiryDate: string;
 };
 
-async function getCoupons(page: number, limit: number,setCount:any) {
-  const { data } = await axiosInstance.get("/coupons", {params:{page,limit}});
-  setCount(data?.data?.options.count);
-  return data;
-}
 
-async function addCoupon(couponData: Omit<Coupon, "_id">) {
-  const { data } = await axiosInstance.post("/coupons", couponData);
-  return data;
-}
-
-async function updateCoupon(coupon: Coupon) {
-  const { data } = await axiosInstance.put(`/coupons/${coupon._id}`, coupon);
-  return data;
-}
-
-async function deleteCoupon(couponId: string) {
-  const { data } = await axiosInstance.delete(`/coupons/${couponId}`);
-  return data;
-}
 
 export default function CouponPage() {
   const [coupon, setCoupon] = useState<Partial<Coupon>>({
@@ -75,6 +56,27 @@ export default function CouponPage() {
     discount: { type: "PERCENTAGE", value: 0 },
     expiryDate: "",
   });
+  const axiosInstance = useAxiosInstance()
+  async function getCoupons(page: number, limit: number, setCount: any) {
+    const { data } = await axiosInstance.get("/coupons", { params: { page, limit } });
+    setCount(data?.data?.options.count);
+    return data;
+  }
+
+  async function addCoupon(couponData: Omit<Coupon, "_id">) {
+    const { data } = await axiosInstance.post("/coupons", couponData);
+    return data;
+  }
+
+  async function updateCoupon(coupon: Coupon) {
+    const { data } = await axiosInstance.put(`/coupons/${coupon._id}`, coupon);
+    return data;
+  }
+
+  async function deleteCoupon(couponId: string) {
+    const { data } = await axiosInstance.delete(`/coupons/${couponId}`);
+    return data;
+  }
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [count, setCount] = useState(0);
@@ -90,7 +92,7 @@ export default function CouponPage() {
     error
   } = useQuery({
     queryKey: ["coupons", page, limit],
-    queryFn: () =>  getCoupons(page, limit,setCount),
+    queryFn: () => getCoupons(page, limit, setCount),
   });
 
   const addCouponMutation = useMutation({
@@ -101,7 +103,7 @@ export default function CouponPage() {
         description: "تم إضافة الكوبون بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["coupons",page,limit] });
+      queryClient.invalidateQueries({ queryKey: ["coupons", page, limit] });
       resetForm();
     },
     onError: () => {
@@ -121,7 +123,7 @@ export default function CouponPage() {
         description: "تم تحديث الكوبون بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["coupons",page,limit] });
+      queryClient.invalidateQueries({ queryKey: ["coupons", page, limit] });
       resetForm();
       setIsEditing(false);
     },
@@ -143,7 +145,7 @@ export default function CouponPage() {
         description: "تم حذف الكوبون بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["coupons",page,limit] });
+      queryClient.invalidateQueries({ queryKey: ["coupons", page, limit] });
     },
     onError: () => {
       toast({

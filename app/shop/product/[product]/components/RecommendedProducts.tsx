@@ -1,15 +1,17 @@
 import Product from "@/app/(components)/Product";
-import axiosInstance from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import ProductSkelton from "@/app/(components)/ProductSkelton";
+import useAxiosInstance from "@/utils/axiosInstance";
 
-async function getProducts() {
-  const { data } = await axiosInstance.get("products");
-  return data.data;
-}
 
 function RecommendedProducts() {
+  const axiosInstance = useAxiosInstance()
+  async function getProducts() {
+    const { data } = await axiosInstance.get("products");
+    return data.data;
+  }
+
   const {
     data: productsData,
     isLoading: productsLoading,

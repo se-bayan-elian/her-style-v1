@@ -3,8 +3,8 @@ import Image from "next/image";
 import { ShoppingBag, Star } from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axiosInstance from "@/utils/axiosInstance";
 import { toast } from "@/hooks/use-toast";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 interface ProductProps {
   image: string;
@@ -18,17 +18,7 @@ interface ProductProps {
   className?: string;
 }
 
-const addToCartMutation = async (productId: string) => {
-  const array = productId.split("/");
-  const type = array[1];
-  const id = array[array.length - 1];
 
-  const response = await axiosInstance.post(`cart/add-${type}/${id}`, {
-    quantity: 1,
-  });
-  console.log(response);
-  return response.data;
-};
 
 const Product: React.FC<ProductProps> = ({
   id,
@@ -41,7 +31,18 @@ const Product: React.FC<ProductProps> = ({
   className,
 }) => {
   const queryClient = useQueryClient();
+  const axiosInstance = useAxiosInstance()
+  const addToCartMutation = async (productId: string) => {
+    const array = productId.split("/");
+    const type = array[1];
+    const id = array[array.length - 1];
 
+    const response = await axiosInstance.post(`cart/add-${type}/${id}`, {
+      quantity: 1,
+    });
+    console.log(response);
+    return response.data;
+  };
   const mutation = useMutation({
     mutationFn: (productId: string) => addToCartMutation(productId),
     onSuccess: () => {
@@ -93,9 +94,8 @@ const Product: React.FC<ProductProps> = ({
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
-                className={`w-4 h-4 ${
-                  i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
-                }`}
+                className={`w-4 h-4 ${i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
+                  }`}
               />
             ))}
           </div>
@@ -120,8 +120,8 @@ const Product: React.FC<ProductProps> = ({
                 {100 - Math.floor((price / originalPrice) * 100)}%
               </p>
               <p className="text-gray-500 line-through text-sm flex gap-0 justify-start flex-row-reverse">
-                <span>{originalPrice.toFixed(2)}</span> 
-                <span>ر.س</span> 
+                <span>{originalPrice.toFixed(2)}</span>
+                <span>ر.س</span>
               </p>
             </div>
           </div>

@@ -15,7 +15,6 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import axiosInstance from "@/utils/axiosInstance";
 import { CldUploadButton } from "next-cloudinary";
 import {
   AlertDialog,
@@ -31,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import Pagination from "@/app/(components)/Pagination";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 type Package = {
   _id: string;
@@ -63,6 +63,7 @@ function PackagePage() {
   const [packageToDelete, setPackageToDelete] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const formRef = React.useRef<HTMLFormElement | null>(null); // Create a ref for the form
+  const axiosInstance = useAxiosInstance()
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-packages", page, limit],
@@ -84,7 +85,7 @@ function PackagePage() {
         description: "تم إضافة الحزمة بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-packages",page,limit] });
+      queryClient.invalidateQueries({ queryKey: ["admin-packages", page, limit] });
       resetForm();
     },
     onError: () => {
@@ -106,7 +107,7 @@ function PackagePage() {
         description: "تم تحديث الحزمة بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-packages",page,limit] });
+      queryClient.invalidateQueries({ queryKey: ["admin-packages", page, limit] });
       resetForm();
       setIsEditing(false);
     },
@@ -129,7 +130,7 @@ function PackagePage() {
         description: "تم حذف الحزمة بنجاح",
         duration: 3000,
       });
-      queryClient.invalidateQueries({ queryKey: ["admin-packages",page,limit] });
+      queryClient.invalidateQueries({ queryKey: ["admin-packages", page, limit] });
     },
     onError: () => {
       toast({
@@ -150,22 +151,22 @@ function PackagePage() {
         name === "originalPrice" || name === "finalPrice"
           ? { ...prev.price, [name]: Number(value) || 0 } // Ensure a number is always set
           : name === "tags"
-          ? value.split(",").map((tag) => tag.trim()) // Handle tags input
-          : ["quantity", "availableQuantity"].includes(name)
-          ? Number(value)
-          : value;
+            ? value.split(",").map((tag) => tag.trim()) // Handle tags input
+            : ["quantity", "availableQuantity"].includes(name)
+              ? Number(value)
+              : value;
 
       return {
         ...prev,
         [name]: updatedValue,
         ...(name === "originalPrice" || name === "finalPrice"
           ? {
-              price: {
-                originalPrice: prev.price?.originalPrice || 0,
-                finalPrice: prev.price?.finalPrice || 0,
-                [name]: Number(value) || 0,
-              },
-            }
+            price: {
+              originalPrice: prev.price?.originalPrice || 0,
+              finalPrice: prev.price?.finalPrice || 0,
+              [name]: Number(value) || 0,
+            },
+          }
           : {}),
         ...(name === "description" ? { description: value } : {}), // Handle description input
       };
@@ -393,8 +394,8 @@ function PackagePage() {
                 ? "تحديث..."
                 : "تحديث الحزمة"
               : createPackageMutation.isPending
-              ? "إضافة..."
-              : "إضافة حزمة"}
+                ? "إضافة..."
+                : "إضافة حزمة"}
           </Button>
         </form>
 

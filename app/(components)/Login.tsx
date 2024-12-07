@@ -17,7 +17,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Signup from "./Signup";
-import axiosInstance from "@/utils/axiosInstance";
 import { setCookie } from "cookies-next";
 import { User } from "lucide-react";
 import Link from "next/link";
@@ -28,6 +27,7 @@ import axios from "axios";
 import { openLogin } from "@/utils/loginSlice";
 import GeneralAlert from "./Alert";
 import { toast } from "@/hooks/use-toast";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 type LoginFormData = {
   email: string;
@@ -39,26 +39,7 @@ type ForgotPasswordFormData = {
   email: string;
 };
 
-const loginUser = async (data: LoginFormData) => {
-  try {
-    const response = await axiosInstance.post("/users/login", data);
-    return response?.data;
-  } catch (error) {
-    throw error;
-  }
-};
 
-const resetPassword = async (data: ForgotPasswordFormData) => {
-  try {
-    const response = await axios.post(
-      "https://herstyleapi.onrender.com/api/v1/users/reset-password-link",
-      data
-    );
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
 
 export function Login() {
   const queryClient = useQueryClient();
@@ -66,7 +47,26 @@ export function Login() {
   const isOpen = useSelector((state: RootState) => state.login.open);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const axiosInstance = useAxiosInstance()
+  const loginUser = async (data: LoginFormData) => {
+    try {
+      const response = await axiosInstance.post("/users/login", data);
+      return response?.data;
+    } catch (error) {
+      throw error;
+    }
+  };
 
+  const resetPassword = async (data: ForgotPasswordFormData) => {
+    try {
+      const response = await axiosInstance.post("/users/reset-password-link",
+        data
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
   const {
     register,
     handleSubmit,

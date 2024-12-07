@@ -6,18 +6,19 @@ import Image from "next/image";
 import Link from "next/link";
 import Logo from "@/app/(components)/logo";
 import { Login } from "./Login";
-import axiosInstance from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import Cart from "./Cart";
 import { Menu, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 export default function Header() {
   const [showTopBanner, setShowTopBanner] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const axiosInstance = useAxiosInstance()
 
   const debouncedSetSearch = useCallback(
     debounce((term: string) => {

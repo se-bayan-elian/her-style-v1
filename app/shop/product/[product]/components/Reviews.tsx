@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { Star, User } from "lucide-react";
 import DateOfComment from "@/app/shop/component/Date";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axiosInstance from "@/utils/axiosInstance";
 import { toast } from "@/hooks/use-toast";
+import useAxiosInstance from "@/utils/axiosInstance";
 
 export default function Reviews({
   comments = [],
@@ -15,6 +15,7 @@ export default function Reviews({
   id: string;
 }) {
   const queryClient = useQueryClient();
+  const axiosInstance = useAxiosInstance()
 
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(0);
@@ -76,9 +77,8 @@ export default function Reviews({
         </div>
       ) : (
         <div
-          className={`cart-items ${
-            comments.length > 5 ? "h-[100vh] overflow-y-scroll" : ""
-          }`}
+          className={`cart-items ${comments.length > 5 ? "h-[100vh] overflow-y-scroll" : ""
+            }`}
           style={{ direction: "rtl", textAlign: "right" }}
         >
           {comments.map((review: any) => (
@@ -98,11 +98,10 @@ export default function Reviews({
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`w-4 h-4 ${
-                            i < review.stars
+                          className={`w-4 h-4 ${i < review.stars
                               ? "text-yellow-400 fill-current"
                               : "text-gray-300"
-                          }`}
+                            }`}
                         />
                       ))}
                       <span className="text-gray-600 text-sm ml-2">
@@ -126,11 +125,10 @@ export default function Reviews({
           {[...Array(5)].map((_, index) => (
             <Star
               key={index}
-              className={`w-6 h-6 cursor-pointer ${
-                index < newRating
+              className={`w-6 h-6 cursor-pointer ${index < newRating
                   ? "text-yellow-400 fill-current"
                   : "text-gray-300"
-              }`}
+                }`}
               onClick={() => handleRatingChange(index + 1)}
             />
           ))}

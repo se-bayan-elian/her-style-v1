@@ -11,15 +11,18 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import axiosInstance from "@/utils/axiosInstance";
+import useAxiosInstance from "@/utils/axiosInstance";
 
-// Fetch slider data from API
-const fetchSliderData = async () => {
-  const response = await axiosInstance.get("/sliders");
-  return response.data.data;
-};
 
 function Carousel() {
-  const { data, isLoading, isError,error } = useQuery({
+  const axiosInstance = useAxiosInstance()
+  // Fetch slider data from API
+  const fetchSliderData = async () => {
+    const response = await axiosInstance.get("/sliders");
+    return response.data.data;
+  };
+
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["sliders"],
     queryFn: fetchSliderData,
   });
