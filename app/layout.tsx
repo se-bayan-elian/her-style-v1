@@ -52,6 +52,7 @@ export default function RootLayout({
         <meta property="og:image" content={`${process.env.NEXT_PUBLIC_BASE_URL}/og-image.png`} />
         <meta property="og:url" content={process.env.NEXT_PUBLIC_BASE_URL} />
         <meta property="og:type" content="website" />
+        <meta property="og:locale" content="ar_AR" />
 
         {/* Twitter Metadata */}
         <meta name="twitter:card" content="summary_large_image" />
