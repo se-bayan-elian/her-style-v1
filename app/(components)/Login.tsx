@@ -216,7 +216,7 @@ export function Login() {
                 >
                   نسيت كلمة المرور؟
                 </button>
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                   <Label htmlFor="isPersistent" className="text-sm">
                     تذكرني
                   </Label>

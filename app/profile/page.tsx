@@ -160,7 +160,7 @@ export default function ProfilePage() {
             />
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <form className="space-y-4 mb-4" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex justify-between items-center border-2 rounded-lg border-gray-200 px-2">
               <div className="flex items-center gap-2">
                 <SquarePenIcon />
