@@ -227,14 +227,14 @@ export default function ProfilePage() {
                 ? "... جاري الحفظ"
                 : "حفظ التعديلات"}
             </Button>
-            <Button
-              variant="destructive"
-              className="w-full"
-              onClick={handleSignOut}
-            >
-              تسجيل الخروج
-            </Button>
           </form>
+          <Button
+            variant="destructive"
+            className="w-full"
+            onClick={handleSignOut}
+          >
+            تسجيل الخروج
+          </Button>
         </TabsContent>
         <TabsContent value="orders" className="w-[80vw] lg:w-auto">
           <Orders defaultId={orderId || ""} />
