@@ -32,7 +32,7 @@ import { toast } from "@/hooks/use-toast";
 type LoginFormData = {
   email: string;
   password: string;
-  IsPersistent: boolean;
+  isPersistent: boolean;
 };
 
 type ForgotPasswordFormData = {
@@ -42,7 +42,6 @@ type ForgotPasswordFormData = {
 const loginUser = async (data: LoginFormData) => {
   try {
     const response = await axiosInstance.post("/users/login", data);
-
     return response?.data;
   } catch (error) {
     throw error;
@@ -67,18 +66,26 @@ export function Login() {
   const isOpen = useSelector((state: RootState) => state.login.open);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<LoginFormData>();
+    setValue,
+  } = useForm<LoginFormData>({
+    defaultValues: {
+      isPersistent: false, // Ensure the default is set to a boolean value
+    },
+  });
+
   const {
     register: registerForgotPassword,
     handleSubmit: handleSubmitForgotPassword,
     formState: { errors: forgotPasswordErrors },
     reset: resetForgotPassword,
   } = useForm<ForgotPasswordFormData>();
+
   const [error, setError] = useState("");
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState("");
   const user = useSelector((state: RootState) => state.user.name);
@@ -94,7 +101,6 @@ export function Login() {
       setError("");
     },
     onSuccess: (data) => {
-      console.log("from success");
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       setCookie("auth_token", data.accessToken, {
         maxAge: 30 * 24 * 60 * 60,
@@ -108,7 +114,7 @@ export function Login() {
       dispatch(addName(data.user.name));
     },
     onError: (error: any) => {
-      if (error.response.status === 403) {
+      if (error.response?.status === 403) {
         setError("يرجى تفعيل بريدك الإلكتروني");
       } else setError("بيانات الاعتماد خاطئة");
       reset();
@@ -120,17 +126,15 @@ export function Login() {
     onMutate: () => {
       setForgotPasswordMessage("");
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: "نجاح",
         description: "راجع بريدك الإلكتروني لإعادة تعيين كلمة مرورك",
-        // يمكنك إضافة المزيد من الخصائص هنا إذا لزم الأمر
       });
       resetForgotPassword();
       setIsForgotPasswordOpen(false);
     },
-    onError: (error) => {
-      console.error("Password reset failed", error);
+    onError: () => {
       setForgotPasswordMessage(
         "فشل إعادة تعيين كلمة المرور. يرجى المحاولة مرة أخرى"
       );
@@ -151,9 +155,8 @@ export function Login() {
       <Dialog open={isOpen} onOpenChange={(open) => dispatch(openLogin(open))}>
         {user ? (
           <Link
-            href={`/${
-              localStorage.getItem("role") === "OWNER" ? "admin" : "profile"
-            }`}
+            href={`/${localStorage.getItem("role") === "OWNER" ? "admin" : "profile"
+              }`}
             className="flex items-center"
           >
             <User className="text-white mr-2" size={20} />
@@ -161,7 +164,7 @@ export function Login() {
           </Link>
         ) : (
           <DialogTrigger asChild>
-            <button className="bg-purple text-white   rounded">
+            <button className="bg-purple text-white rounded">
               تسجيل الدخول
             </button>
           </DialogTrigger>
@@ -177,36 +180,32 @@ export function Login() {
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-4 pm-4 pt-2 mb-2">
-              <div className="grid grid-cols-4 items-center gap-4 ">
-                <Input
-                  id="email"
-                  placeholder="البريد الإلكتروني"
-                  className="col-span-4 focus-visible:ring-purple-500 text-right"
-                  {...register("email", {
-                    required: "البريد الإلكتروني مطلوب",
-                  })}
-                />
-                {errors.email && (
-                  <span className="text-red text-sm col-span-4 text-right">
-                    {errors.email.message}
-                  </span>
-                )}
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Input
-                  id="password"
-                  placeholder="كلمة المرور"
-                  type="password"
-                  className="col-span-4 focus-visible:ring-purple-500 text-right text-nowrap"
-                  {...register("password", { required: "كلمة المرور مطلوبة" })}
-                />
-                {errors.password && (
-                  <span className="text-red text-sm col-span-4 text-right">
-                    {errors.password.message}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center justify-between w-full">
+              <Input
+                id="email"
+                placeholder="البريد الإلكتروني"
+                className="focus-visible:ring-purple-500 text-right"
+                {...register("email", { required: "البريد الإلكتروني مطلوب" })}
+              />
+              {errors.email && (
+                <span className="text-red text-sm text-right">
+                  {errors.email.message}
+                </span>
+              )}
+
+              <Input
+                id="password"
+                placeholder="كلمة المرور"
+                type="password"
+                className="focus-visible:ring-purple-500 text-right"
+                {...register("password", { required: "كلمة المرور مطلوبة" })}
+              />
+              {errors.password && (
+                <span className="text-red text-sm text-right">
+                  {errors.password.message}
+                </span>
+              )}
+
+              <div className="flex items-center justify-between">
                 <button
                   type="button"
                   className="text-purple text-sm"
@@ -217,36 +216,27 @@ export function Login() {
                 >
                   نسيت كلمة المرور؟
                 </button>
-                <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                  <Label
-                    htmlFor="IsPersistent"
-                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
+                <div className="flex items-center">
+                  <Label htmlFor="isPersistent" className="text-sm">
                     تذكرني
                   </Label>
-                  <Checkbox id="IsPersistent" {...register("IsPersistent")} />
+                  <Checkbox
+                    id="isPersistent"
+                    onCheckedChange={(checked: boolean) =>
+                      setValue("isPersistent", checked)
+                    }
+                  />
                 </div>
               </div>
             </div>
             <DialogFooter>
-              <div className="w-full">
-                <div>
-                  <Button
-                    type="submit"
-                    className="bg-purple text-white px-4 py-2 rounded w-full"
-                    disabled={loginMutation.isPending}
-                  >
-                    {loginMutation.isPending ? "...جاري الدخول" : "دخول"}
-                  </Button>
-                </div>
-                <button
-                  type="button"
-                  className="text-purple px-4 py-2 rounded w-full"
-                  onClick={() => setIsSignupOpen(true)}
-                >
-                  تسجيل جديد
-                </button>
-              </div>
+              <Button
+                type="submit"
+                className="bg-purple text-white w-full"
+                disabled={loginMutation.isPending}
+              >
+                {loginMutation.isPending ? "...جاري الدخول" : "دخول"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -257,37 +247,30 @@ export function Login() {
         onOpenChange={setIsForgotPasswordOpen}
       >
         <DialogContent className="sm:max-w-[425px] gap-1">
-          <DialogHeader className="flex justify-between items-end">
+          <DialogHeader>
             <DialogTitle>نسيت كلمة المرور</DialogTitle>
             <DialogDescription className="text-right">
               أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور.
             </DialogDescription>
           </DialogHeader>
-          {forgotPasswordMessage && (
-            <GeneralAlert type="error" message={forgotPasswordMessage} />
-          )}
           <form onSubmit={handleSubmitForgotPassword(onSubmitForgotPassword)}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Input
-                  id="forgotPasswordEmail"
-                  placeholder="البريد الإلكتروني"
-                  className="col-span-4 focus-visible:ring-purple-500 text-right"
-                  {...registerForgotPassword("email", {
-                    required: "البريد الإلكتروني مطلوب",
-                  })}
-                />
-                {forgotPasswordErrors.email && (
-                  <span className="text-red col-span-4 text-right">
-                    {forgotPasswordErrors.email.message}
-                  </span>
-                )}
-              </div>
-            </div>
+            <Input
+              id="forgotPasswordEmail"
+              placeholder="البريد الإلكتروني"
+              className="focus-visible:ring-purple-500 text-right"
+              {...registerForgotPassword("email", {
+                required: "البريد الإلكتروني مطلوب",
+              })}
+            />
+            {forgotPasswordErrors.email && (
+              <span className="text-red text-sm text-right">
+                {forgotPasswordErrors.email.message}
+              </span>
+            )}
             <DialogFooter>
               <Button
                 type="submit"
-                className="bg-purple text-white px-4 py-2 rounded w-full"
+                className="bg-purple text-white w-full"
                 disabled={resetPasswordMutation.isPending}
               >
                 {resetPasswordMutation.isPending
