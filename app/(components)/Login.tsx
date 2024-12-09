@@ -297,10 +297,10 @@ export function Login() {
         open={isForgotPasswordOpen}
         onOpenChange={setIsForgotPasswordOpen}
       >
-        <DialogContent className="sm:max-w-[425px] gap-1">
-          <DialogHeader>
-            <DialogTitle>نسيت كلمة المرور</DialogTitle>
-            <DialogDescription className="text-right">
+        <DialogContent className="sm:max-w-[425px] gap-1" dir="rtl">
+          <DialogHeader dir="rtl">
+            <DialogTitle className="text-right">نسيت كلمة المرور</DialogTitle>
+            <DialogDescription className="text-right mb-1">
               أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور.
             </DialogDescription>
           </DialogHeader>
@@ -308,7 +308,7 @@ export function Login() {
             <Input
               id="forgotPasswordEmail"
               placeholder="البريد الإلكتروني"
-              className="focus-visible:ring-purple-500 text-right"
+              className="focus-visible:ring-purple-500 text-right mb-2"
               {...registerForgotPassword("email", {
                 required: "البريد الإلكتروني مطلوب",
               })}
@@ -325,7 +325,7 @@ export function Login() {
                 disabled={resetPasswordMutation.isPending}
               >
                 {resetPasswordMutation.isPending
-                  ? "...جاري الإرسال"
+                  ? "جاري الإرسال"
                   : "إرسال رابط إعادة التعيين"}
               </Button>
             </DialogFooter>
