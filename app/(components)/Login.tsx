@@ -28,6 +28,7 @@ import { openLogin } from "@/utils/loginSlice";
 import GeneralAlert from "./Alert";
 import { toast } from "@/hooks/use-toast";
 import useAxiosInstance from "@/utils/axiosInstance";
+import { useRouter } from "next/navigation";
 
 type LoginFormData = {
   email: string;
@@ -43,11 +44,14 @@ type ForgotPasswordFormData = {
 
 export function Login() {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const dispatch = useDispatch();
   const isOpen = useSelector((state: RootState) => state.login.open);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-  const axiosInstance = useAxiosInstance()
+  const [isResendCodeALlowed, setIsResendCodeALlowed] = useState(false);
+  const axiosInstance = useAxiosInstance();
+
   const loginUser = async (data: LoginFormData) => {
     try {
       const response = await axiosInstance.post("/users/login", data);
@@ -67,12 +71,24 @@ export function Login() {
       throw error;
     }
   };
+  const resendCode = async (email: string | null) => {
+    try {
+      const response = await axiosInstance.post(`/users/resend-verification-email`,
+        { email }
+      );
+      return response.data; // Assuming the response contains the message you need
+    } catch (e) {
+      throw e;
+    }
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
     setValue,
+    watch
   } = useForm<LoginFormData>({
     defaultValues: {
       isPersistent: false, // Ensure the default is set to a boolean value
@@ -88,8 +104,27 @@ export function Login() {
 
   const [error, setError] = useState("");
   const [forgotPasswordMessage, setForgotPasswordMessage] = useState("");
-  const user = useSelector((state: RootState) => state.user.name);
-
+  const user = useSelector((state: RootState) => state?.user?.name);
+  const resendCodeMutation = useMutation({
+    mutationFn: () => resendCode(watch('email')),
+    onSuccess: () => {
+      setIsResendCodeALlowed(false);
+      dispatch(openLogin(false));
+      setError('')
+      toast({
+        title: "نجاح",
+        description: "تم إرسال الكود بنجاح ، قم بمراجعة بريدك الإلكتروني",
+      });
+    },
+    onError: () => {
+      setError('أماأن الحساب مفعل أو أعد المحاولة بعد 5 دقائق')
+      toast({
+        title: "فشل",
+        description: "حدث خطأ غير متوقع ، قم بإعادة المحاولة بعد 5 دقائق",
+        variant: "destructive",
+      });
+    },
+  });
   useEffect(() => {
     const storedUser = localStorage.getItem("user") || "";
     dispatch(addName(storedUser));
@@ -114,10 +149,13 @@ export function Login() {
       dispatch(addName(data.user.name));
     },
     onError: (error: any) => {
-      if (error.response?.status === 403) {
+      if (error.response?.data.errorCode === 403) {
+        setIsResendCodeALlowed(true)
         setError("يرجى تفعيل بريدك الإلكتروني");
-      } else setError("بيانات الاعتماد خاطئة");
-      reset();
+      } else {
+        setError("بيانات الاعتماد خاطئة");
+        reset();
+      }
     },
   });
 
@@ -176,7 +214,13 @@ export function Login() {
               .قم بإدخال بيانات تسجيل الدخول الخاصة بك هنا
             </DialogDescription>
           </DialogHeader>
-          {error && <GeneralAlert type="error" message={error} />}
+          {error && <GeneralAlert type="error" message={error}>
+            {isResendCodeALlowed && <button className="underline hover:text-red-900" disabled={resendCodeMutation.isPending} onClick={() => {
+              resendCodeMutation.mutate()
+            }}>
+              {resendCodeMutation.isPending ? "جاري الإرسال" : "إعادة إرسال الكود"}
+            </button>}
+          </GeneralAlert>}
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-4 pm-4 pt-2 mb-2">
@@ -229,18 +273,25 @@ export function Login() {
                 </div>
               </div>
             </div>
-            <DialogFooter>
-              <Button
-                type="submit"
-                className="bg-purple text-white w-full"
-                disabled={loginMutation.isPending}
-              >
-                {loginMutation.isPending ? "...جاري الدخول" : "دخول"}
-              </Button>
+            <DialogFooter className="flex flex-col">
+              <div className="w-full">
+                <div>
+                  <Button type="submit" className="bg-purple text-white px-4 py-2 rounded w-full" disabled={loginMutation.isPending}>
+                    {loginMutation.isPending ? '... جاري الدخول' : 'دخول'}
+                  </Button>
+                </div>
+                <button
+                  type="button"
+                  className="text-purple px-4 py-2 rounded w-full"
+                  onClick={() => setIsSignupOpen(true)}
+                >
+                  تسجيل جديد
+                </button>
+              </div>
             </DialogFooter>
           </form>
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       <Dialog
         open={isForgotPasswordOpen}

@@ -27,6 +27,7 @@ import Alert from "../../(components)/Alert";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import useAxiosInstance from "@/utils/axiosInstance";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 function OrderPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -154,9 +155,19 @@ function OrderPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    setValue: setDeliverEmailValue,
+    formState: { errors: deliverEmailErrors },
   } = useForm<{ email: string }>();
 
+  // Fetch deliver-emails data
+  const {
+    data: emails,
+    isLoading: emailsLoading,
+    isError: emailsError,
+  } = useQuery({
+    queryKey: ["deliverEmails"], queryFn: () =>
+      axiosInstance.get("/deliver-emails").then((res) => res.data.data.deliveryEmails)
+  });
   const sendOrderMutation = useMutation({
     mutationFn: (data: { orderId: string; email: string }) =>
       axiosInstance.post("/orders/send-order", data),
@@ -169,6 +180,7 @@ function OrderPage() {
       });
     },
   });
+
   const handleEmailSubmit = (data: { email: string }) => {
     if (selectedOrder) {
       sendOrderMutation.mutate({
@@ -188,150 +200,148 @@ function OrderPage() {
         <CardTitle>الطلبات</CardTitle>
       </CardHeader>
       <CardContent>
-        <>
-          <Table dir="rtl">
-            <TableHeader>
+        <Table dir="rtl" className="h-[400px]">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-right">رقم الطلب</TableHead>
+              <TableHead className="text-right">الإجمالي</TableHead>
+              <TableHead className="text-right">حالة الطلب</TableHead>
+              <TableHead className="text-right">حالة الدفع</TableHead>
+              <TableHead className="text-right">المشتري</TableHead>
+              <TableHead className="text-right">تاريخ الطلب</TableHead>
+              <TableHead className="text-right">الإجراءات</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
               <TableRow>
-                <TableHead className="text-right">رقم الطلب</TableHead>
-                <TableHead className="text-right">الإجمالي</TableHead>
-                <TableHead className="text-right">حالة الطلب</TableHead>
-                <TableHead className="text-right">حالة الدفع</TableHead>
-                <TableHead className="text-right">المشتري</TableHead>
-                <TableHead className="text-right">تاريخ الطلب</TableHead>
-                <TableHead className="text-right">الإجراءات</TableHead>
+                <TableCell colSpan={7} className="text-center py-5">
+                  <div className="flex justify-center items-center space-x-2">
+                    <span className="text-gray-500 text-lg">
+                      جاري تحميل الطلبات...
+                    </span>
+                  </div>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-5">
-                    <div className="flex justify-center items-center space-x-2">
-                      <span className="text-gray-500 text-lg">
-                        جاري تحميل الطلبات...
-                      </span>
+            ) : error ? (
+              <TableRow>
+                <TableCell
+                  colSpan={7}
+                  className="text-center py-5 text-red-500"
+                >
+                  حدث خطأ أثناء تحميل الطلبات. يرجى المحاولة مرة أخرى.
+                </TableCell>
+              </TableRow>
+            ) : (
+              orders.map((order: any) => (
+                <TableRow key={order._id}>
+                  <TableCell>
+                    <button
+                      onClick={() => openDialog(order)}
+                      className="text-blue-600 hover:underline"
+                    >
+                      {order._id}
+                    </button>
+                  </TableCell>
+                  <TableCell>{order.cart.totalPrice} ريال</TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 py-1 rounded-full text-nowrap ${getStatusColor(
+                        order.status
+                      )}`}
+                    >
+                      {getStatusText(order.status)}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 py-1 rounded-full text-nowrap ${getPaymentStatusColor(
+                        order.paymentStatus
+                      )}`}
+                    >
+                      {getPaymentStatusText(order.paymentStatus)}
+                    </span>
+                  </TableCell>
+                  <TableCell>{order.user?.name}</TableCell>
+                  <TableCell>
+                    {new Date(order.createdAt).toLocaleDateString(
+                      "ar-EG-u-nu-arab"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      {order.status === "PENDING" && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="bg-purple text-white"
+                            onClick={() => handleSendDeliveryClick(order)}
+                            disabled={updateOrderStatus.isPending}
+                          >
+                            إرسال التوصيل
+                          </Button>
+                          {order.paymentMethod === "BANKAK" &&
+                            order.paymentStatus === "PENDING" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="bg-green-700 text-white hover:bg-green-600 hover:text-white"
+                                onClick={() =>
+                                  handlePaymentStatusUpdate(
+                                    order._id,
+                                    "SUCCESS"
+                                  )
+                                }
+                                disabled={
+                                  updateOrderPaymentStatus.isPending ||
+                                  updateOrderStatus.isPending
+                                }
+                              >
+                                تأكيد الدفع
+                              </Button>
+                            )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="bg-green-700 text-white hover:bg-green-600 hover:text-white"
+                            onClick={() =>
+                              handleStatusUpdate(order._id, "DELIVERED")
+                            }
+                            disabled={updateOrderStatus.isPending}
+                          >
+                            تم التوصيل
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() =>
+                              handleStatusUpdate(order._id, "CANCELLED")
+                            }
+                            disabled={updateOrderStatus.isPending}
+                          >
+                            إلغاء
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : error ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="text-center py-5 text-red-500"
-                  >
-                    حدث خطأ أثناء تحميل الطلبات. يرجى المحاولة مرة أخرى.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                orders.map((order: any) => (
-                  <TableRow key={order._id}>
-                    <TableCell>
-                      <button
-                        onClick={() => openDialog(order)}
-                        className="text-blue-600 hover:underline"
-                      >
-                        {order._id}
-                      </button>
-                    </TableCell>
-                    <TableCell>{order.cart.totalPrice} ريال</TableCell>
-                    <TableCell>
-                      <span
-                        className={`px-2 py-1 rounded-full text-nowrap ${getStatusColor(
-                          order.status
-                        )}`}
-                      >
-                        {getStatusText(order.status)}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`px-2 py-1 rounded-full text-nowrap ${getPaymentStatusColor(
-                          order.paymentStatus
-                        )}`}
-                      >
-                        {getPaymentStatusText(order.paymentStatus)}
-                      </span>
-                    </TableCell>
-                    <TableCell>{order.user?.name}</TableCell>
-                    <TableCell>
-                      {new Date(order.createdAt).toLocaleDateString(
-                        "ar-EG-u-nu-arab"
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        {order.status === "PENDING" && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="bg-purple text-white"
-                              onClick={() => handleSendDeliveryClick(order)}
-                              disabled={updateOrderStatus.isPending}
-                            >
-                              إرسال التوصيل
-                            </Button>
-                            {order.paymentMethod === "BANKAK" &&
-                              order.paymentStatus === "PENDING" && (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="bg-green-700 text-white hover:bg-green-600 hover:text-white"
-                                  onClick={() =>
-                                    handlePaymentStatusUpdate(
-                                      order._id,
-                                      "SUCCESS"
-                                    )
-                                  }
-                                  disabled={
-                                    updateOrderPaymentStatus.isPending ||
-                                    updateOrderStatus.isPending
-                                  }
-                                >
-                                  تأكيد الدفع
-                                </Button>
-                              )}
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="bg-green-700 text-white hover:bg-green-600 hover:text-white"
-                              onClick={() =>
-                                handleStatusUpdate(order._id, "DELIVERED")
-                              }
-                              disabled={updateOrderStatus.isPending}
-                            >
-                              تم التوصيل
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() =>
-                                handleStatusUpdate(order._id, "CANCELLED")
-                              }
-                              disabled={updateOrderStatus.isPending}
-                            >
-                              إلغاء
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+              ))
+            )}
+          </TableBody>
+        </Table>
 
-          <Pagination
-            currentPage={page}
-            totalCount={count}
-            limit={limit}
-            onPageChange={(newPage) => setPage(newPage)}
-            onLimitChange={(newLimit) => {
-              setLimit(newLimit);
-              setPage(1); // Reset to first page when limit changes
-            }}
-          />
-        </>
+        <Pagination
+          currentPage={page}
+          totalCount={count}
+          limit={limit}
+          onPageChange={(newPage) => setPage(newPage)}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit);
+            setPage(1); // Reset to first page when limit changes
+          }}
+        />
       </CardContent>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -455,32 +465,45 @@ function OrderPage() {
             onSubmit={handleSubmit(handleEmailSubmit)}
             className="space-y-4"
           >
-            <div>
-              <label className="block text-md font-medium">
-                البريد الإلكتروني
-              </label>
-              <Input
-                type="email"
-                placeholder="ادخل ايميل البائع"
-                className="w-full border rounded-md px-4 py-2"
-                {...register("email", {
-                  required: "الإيميل مطلوب",
-                  pattern: {
-                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                    message: "البريد الإلكتروني غير صالح",
-                  },
-                })}
-              />
-              {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email.message}</p>
-              )}
-            </div>
+            <label className="block text-md font-medium">
+              البريد الإلكتروني
+            </label>
+            {emailsLoading ? (
+              <div className="flex justify-center items-center">
+                جاري تحميل البيانات
+              </div>
+            ) : emailsError ? (
+              <p className="text-red-500">حدث خطأ أثناء تحميل البريد الإلكتروني.</p>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {/* ChadCN Select Dropdown */}
+                <Select dir="rtl" onValueChange={(email) => {
+                  setDeliverEmailValue("email", email)
+                }}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="اختر بريدًا إلكترونيًا" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {emails?.map((email: any) => (
+                      <SelectItem key={email._id} value={email.email}>
+                        {email.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {deliverEmailErrors.email && (
+                  <p className="text-red-500 text-sm">{deliverEmailErrors.email.message}</p>
+                )}
+
+              </div>
+            )}
             <Button
               type="submit"
+              className="mr-auto"
               disabled={sendOrderMutation.isPending}
-              className="mr-auto block mt-0 bg-purple"
             >
-              {sendOrderMutation.isPending ? "جاري الإرسال" : "إرسال"}
+              إرسال
             </Button>
           </form>
         </DialogContent>

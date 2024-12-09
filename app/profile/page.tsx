@@ -130,7 +130,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-w-5xl mx-auto p-6 bg-white rounded-lg shadow-md my-8">
+    <div className="min-w-5xl mx-auto   pt-2 px-0 md:p-6 bg-white rounded-lg shadow-md my-8">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger
@@ -238,7 +238,7 @@ export default function ProfilePage() {
             تسجيل الخروج
           </Button>
         </TabsContent>
-        <TabsContent value="orders" className="w-[80vw] lg:w-auto">
+        <TabsContent value="orders" className="w-[90vw] lg:w-[60vw]">
           <Orders defaultId={orderId || ""} />
         </TabsContent>
       </Tabs>

@@ -37,6 +37,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import Pagination from "@/app/(components)/Pagination";
 import useAxiosInstance from "@/utils/axiosInstance";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Coupon = {
   _id: string;
@@ -323,7 +324,8 @@ export default function CouponPage() {
             )}
           </Button>
         </form>
-        <Table dir="rtl">
+
+        <Table dir="rtl" className="h-[400px]">
           <TableHeader>
             <TableRow>
               <TableHead className="text-right">الخصم</TableHead>
@@ -384,7 +386,6 @@ export default function CouponPage() {
             )}
           </TableBody>
         </Table>
-
         <AlertDialog open={!!couponToDelete} onOpenChange={handleCancelDelete}>
           <AlertDialogContent>
             <AlertDialogHeader>

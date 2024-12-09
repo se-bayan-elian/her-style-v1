@@ -51,12 +51,12 @@ const PaymentCallback: React.FC = () => {
 
     // Redirect to appropriate page after 5 seconds
     const timeout = setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
       router.replace(
         status === "paid" || status === "completed"
           ? `/profile?tab=orders&orderId=${orderIdParam || orderId}`
           : "/"
       );
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
     }, 5000);
 
     return () => clearTimeout(timeout); // Cleanup timeout on unmount

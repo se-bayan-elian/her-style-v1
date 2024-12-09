@@ -14,6 +14,7 @@ import Productpage from "./components/Productpage";
 import PackagePage from "./components/PackagePage";
 import OrderPage from "./components/OrderPage";
 import SlidersPage from "./components/SlidersPage";
+import DeliveryEmails from "./components/DeliverEmailsPage";
 export default function AdminDashboard() {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -62,6 +63,9 @@ export default function AdminDashboard() {
             <TabsTrigger value="sliders" className="px-4 py-2">
               البانرات
             </TabsTrigger>
+            <TabsTrigger value="deliverEmails" className="px-4 py-2">
+              إيميلات التوصيل
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="orders">
@@ -81,6 +85,9 @@ export default function AdminDashboard() {
           </TabsContent>
           <TabsContent value="sliders">
             <SlidersPage />
+          </TabsContent>
+          <TabsContent value="deliverEmails">
+            <DeliveryEmails />
           </TabsContent>
         </Tabs>
       </div>

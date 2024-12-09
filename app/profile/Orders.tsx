@@ -22,6 +22,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import Image from "next/image";
 import useAxiosInstance from "@/utils/axiosInstance";
+import Pagination from "../(components)/Pagination";
 
 export interface Order {
   _id: string;
@@ -137,8 +138,15 @@ function Orders({ defaultId }: { defaultId: string }) {
   const initialRender = useRef<boolean>(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const axiosInstance = useAxiosInstance()
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [count, setCount] = useState(0);
   const fetchOrders = async () => {
-    const response = await axiosInstance.get("orders");
+    const response = await axiosInstance.get("orders", {
+      params: { page, limit }
+
+    });
+    setCount(response?.data?.data?.options?.count || 0);
     return response.data;
   };
   const {
@@ -146,7 +154,7 @@ function Orders({ defaultId }: { defaultId: string }) {
     isLoading: isOrdersLoading,
     isError: isOrdersError,
   } = useQuery({
-    queryKey: ["client-order"],
+    queryKey: ["client-order", page, limit],
     queryFn: fetchOrders,
   });
 
@@ -169,10 +177,11 @@ function Orders({ defaultId }: { defaultId: string }) {
 
   return (
     <>
-      <h2 className="text-2xl font-bold my-4 text-right">طلباتي</h2>
-      <Card>
-        <CardContent>
-          <Table dir="rtl">
+      <h2 className="text-2xl font-bold my-4 text-right px-2 md:px-0">طلباتي</h2>
+      <Card className="p-0">
+        <CardContent className="p-0">
+          {/* <ScrollArea className="h-[400px] overflow-y-scroll scroll"> */}
+          <Table dir="rtl" className="h-[400px]">
             <TableHeader>
               <TableRow>
                 <TableHead className="text-center">رقم الطلب</TableHead>
@@ -222,12 +231,12 @@ function Orders({ defaultId }: { defaultId: string }) {
                         {order._id}
                       </Button>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-center">
                       {new Date(order.createdAt).toLocaleDateString(
                         "ar-EG-u-nu-arab"
                       )}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-center">
                       {order.cart.totalPrice} ريال
                     </TableCell>
                     <TableCell className="text-center">
@@ -253,6 +262,7 @@ function Orders({ defaultId }: { defaultId: string }) {
               )}
             </TableBody>
           </Table>
+          {/* </ScrollArea> */}
           {selectedOrder && isDialogOpen && (
             <Dialog
               open={isDialogOpen}
@@ -370,6 +380,16 @@ function Orders({ defaultId }: { defaultId: string }) {
               </DialogContent>
             </Dialog>
           )}
+          <Pagination
+            currentPage={page}
+            totalCount={count}
+            limit={limit}
+            onPageChange={(newPage) => setPage(newPage)}
+            onLimitChange={(newLimit) => {
+              setLimit(newLimit);
+              setPage(1); // Reset to first page when limit changes
+            }}
+          />
         </CardContent>
       </Card>
     </>

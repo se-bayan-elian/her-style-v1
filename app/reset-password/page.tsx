@@ -49,7 +49,7 @@ function WrapResetPassword() {
 
     try {
       const response = await fetch(
-        "https://herstyleapi.onrender.com/api/v1/users/reset-password",
+        `${process.env.NEXT_PUBLIC_API_URL}/users/reset-password`,
         {
           method: "POST",
           headers: {

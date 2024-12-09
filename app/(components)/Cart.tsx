@@ -21,14 +21,7 @@ import CartItemsSkeleton from "./cartItemSkeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 import useAxiosInstance from "@/utils/axiosInstance";
 
-export async function getCart(axiosInstance: any) {
-  try {
-    const response = await axiosInstance.get("/cart");
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-}
+
 export default function Cart() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +30,14 @@ export default function Cart() {
   const path = usePathname();
   const axiosInstance = useAxiosInstance()
 
-
+  async function getCart() {
+    try {
+      const response = await axiosInstance.get("/cart");
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
   async function deleteProductFromCart(productId: string, type: string) {
     try {
       const response = await axiosInstance.delete(

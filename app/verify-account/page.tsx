@@ -13,7 +13,7 @@ import { getCookie } from "cookies-next";
 const verifyAccount = async (token: string | null) => {
   try {
     const response = await axios.post(
-      `https://herstyleapi.onrender.com/api/v1/users/verify-account`,
+      `${process.env.NEXT_PUBLIC_API_URL}/users/verify-account`,
       { token }
     );
     return response.data; // Assuming the response contains the message you need
@@ -22,17 +22,7 @@ const verifyAccount = async (token: string | null) => {
     throw e;
   }
 };
-const resendCode = async (token: string | null) => {
-  try {
-    const response = await axios.post(
-      `https://herstyleapi.onrender.com/api/v1/users/resend-code`,
-      { token }
-    );
-    return response.data; // Assuming the response contains the message you need
-  } catch (e) {
-    throw e;
-  }
-};
+
 
 function VerifyPage() {
   const searchParams = useSearchParams();
@@ -51,24 +41,7 @@ function VerifyPage() {
     },
   });
   // Mutation for verifying account
-  const resendCodeMutation = useMutation({
-    mutationFn: (token: string | null) => resendCode(token),
-    onSuccess: () => {
-      router.replace("/");
-      toast({
-        title: "نجاح",
-        description: "تم إرسال الكود بنجاح ، قم بمراجعة بريدك الإلكتروني",
-      });
-    },
-    onError: () => {
-      router.replace("/");
-      toast({
-        title: "فشل",
-        description: "حدث خطأ غير متوقع ، قم بإعادة المحاولة بعد 5 دقائق",
-        variant: "destructive",
-      });
-    },
-  });
+
 
   // Trigger mutation on page load
   useEffect(() => {
@@ -100,22 +73,7 @@ function VerifyPage() {
                 <p className="text-red-600 text-sm ">
                   الكود خاطئ أو إنتهت صلاحية الكود
                 </p>
-                <p className="text-red-600 text-sm ">
-                  قم بإعادة إرسال الكود ، في حال تكرار المشكلة يرجى الدعم الفني
-                  ، يسعدنا خدمتكم
-                </p>
               </div>
-            )}
-            {/* If you want a button to try again */}
-            {verificationMutation.isError && (
-              <Button
-                className="mt-4 bg-black"
-                onClick={() => resendCodeMutation.mutate(token)}
-              >
-                {resendCodeMutation.isPending
-                  ? "...جاري الإرسال"
-                  : "إعادة إرسال الكود"}
-              </Button>
             )}
           </>
         )}

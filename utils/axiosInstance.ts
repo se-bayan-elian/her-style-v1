@@ -40,7 +40,7 @@ const useAxiosInstance = () => {
 
           try {
             const { data } = await axios.post(
-              `${process.env.NEXT_PUBLIC_API_URL || 'https://herstyleapi.onrender.com/api/v1'}/auth/refresh`,
+              `${process.env.NEXT_PUBLIC_API_URL || 'https://herstyleapi.onrender.com/api/v1'}/users/refresh-token`,
               { withCredentials: true } // Ensure cookies are sent
             );
 
