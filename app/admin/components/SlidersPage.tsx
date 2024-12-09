@@ -590,9 +590,8 @@ function SliderPage() {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             البنرات الحالية
           </h3>
-          <div className="bg-white overflow-hidden shadow-sm rounded-lg">
-            <ScrollArea className="h-[400px] overflow-y-scroll scroll">
-              <Table dir="rtl">
+          <div className="bg-white overflow-hidden shadow-sm rounded-lg"> 
+            <Table dir="rtl" className="h-[450px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-right">الصورة</TableHead>
@@ -666,7 +665,7 @@ function SliderPage() {
                   )}
                 </TableBody>
               </Table>
-            </ScrollArea>
+  
           </div>
         </div>
 
