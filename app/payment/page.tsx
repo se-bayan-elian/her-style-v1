@@ -129,12 +129,12 @@ const PayPalPayment = () => {
   };
 
   const onApprove = async (data: any, actions: any) => {
-    const axiosInstance = useAxiosInstance()
+    
     try {
       // Capture the payment
       setIsPaymentProcessing(true);
       const details = await actions.order.capture();
-      console.log(details);
+      const token = getCookie('auth_token');
       // Get address from cookies (you'll need to set this earlier in your checkout process)
 
       // Create order API call
@@ -142,6 +142,10 @@ const PayPalPayment = () => {
         paymentMethod: "INSTANT",
         address: address.address ?? {},
         paymentId: details.id,
+      },{
+        headers:{
+          Authorization :`Bearer ${token}`
+        }
       });
       router.replace(
         "/payment/callback?status=paid&orderId=" + orderResponse.data.data._id
