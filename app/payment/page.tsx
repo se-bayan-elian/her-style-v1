@@ -129,6 +129,7 @@ const PayPalPayment = () => {
   };
 
   const onApprove = async (data: any, actions: any) => {
+    const axiosInstance = useAxiosInstance()
     try {
       // Capture the payment
       setIsPaymentProcessing(true);
