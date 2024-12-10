@@ -91,7 +91,7 @@ function Footer() {
             />
           </div> */}
           <h3 className="font-bold mt-4 mb-2">الإيميل</h3>
-          <p className="mt-2">omniamahmmed199@gmail.com</p>
+          <p className="mt-2">info@m-hawaak.com</p>
         </div>
         <div className="text-center lg:text-right mx-auto xl:col-span-1 md:col-span-6 order-last  mt-4 ">
           <ul className="space-y-5 mb-5">
