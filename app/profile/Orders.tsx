@@ -277,7 +277,7 @@ function Orders({ defaultId }: { defaultId: string }) {
                 <DialogHeader>
                   <DialogTitle className="text-right">تفاصيل الطلب</DialogTitle>
                 </DialogHeader>
-                <ScrollArea className="h-[400px] w-full rounded-md border p-4">
+                <div className="h-[400px] w-full rounded-md border p-4">
                   <div className="grid gap-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="text-right">
@@ -376,7 +376,7 @@ function Orders({ defaultId }: { defaultId: string }) {
                       </div>
                     </div>
                   </div>
-                </ScrollArea>
+                </div>
               </DialogContent>
             </Dialog>
           )}
