@@ -350,7 +350,7 @@ function OrderPage() {
             <DialogTitle className="text-right">تفاصيل الطلب</DialogTitle>
           </DialogHeader>
           {selectedOrder && (
-            <ScrollArea className="h-[400px] w-full rounded-md border p-4">
+            <div className="h-[400px] w-full rounded-md border p-4">
               <div className="grid gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="text-right">
@@ -445,7 +445,7 @@ function OrderPage() {
                   </div>
                 </div>
               </div>
-            </ScrollArea>
+            </div>
           )}
         </DialogContent>
       </Dialog>
