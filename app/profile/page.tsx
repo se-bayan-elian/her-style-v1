@@ -130,7 +130,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-w-5xl mx-auto   pt-2 px-0 md:p-6 bg-white rounded-lg shadow-md my-8">
+    <div className="min-w-5xl mx-auto   pt-2 px-1 md:p-6 bg-white rounded-lg shadow-md my-8">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger
