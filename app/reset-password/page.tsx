@@ -71,7 +71,7 @@ function WrapResetPassword() {
         });
         router.replace("/");
       } else {
-        setError(data.message || "فشل في إعادة تعيين كلمة المرور");
+        setError("الكود خاطئ أو انتهت صلاحيته ، حاول مرة آخرى");
       }
     } catch (err) {
       setError("حدث خطأ. يرجى المحاولة مرة أخرى.");
