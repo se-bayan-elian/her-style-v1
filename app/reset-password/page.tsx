@@ -74,7 +74,7 @@ function WrapResetPassword() {
         setError("الكود خاطئ أو انتهت صلاحيته ، حاول مرة آخرى");
       }
     } catch (err) {
-      setError("حدث خطأ. يرجى المحاولة مرة أخرى.");
+      setError("حدث خطأ. يرجى المحاولة مرة أخرى");
     } finally {
       setIsLoading(false);
     }
