@@ -191,7 +191,7 @@ function Orders({ defaultId }: { defaultId: string }) {
                 <TableHead className="text-center">حالة الدفع</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="justify-start">
               {isOrdersLoading ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-5">
